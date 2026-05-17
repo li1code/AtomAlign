@@ -1,0 +1,262 @@
+# AtomAlign — In-House Goal Setting & Tracking Portal
+> Built for **AtomQuest Hackathon 1.0** · Full-stack TypeScript · PostgreSQL · Next.js 15
+
+---
+
+AtomAlign is a production-grade, role-aware Goal Setting & Tracking Portal that manages the complete lifecycle of employee goals — from draft submission and manager approval to quarterly check-ins and audit-ready governance. Built to replace the spreadsheet-and-email model with a system that enforces alignment, not just records it.
+
+---
+
+## Architecture Overview
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                        Client Layer                         │
+│          Next.js 15 (Turbopack) · Tailwind · shadcn/ui      │
+│    Zustand State · Axios · Custom Hooks · Route Guards       │
+└───────────────────────────┬─────────────────────────────────┘
+                            │ REST API
+┌───────────────────────────▼─────────────────────────────────┐
+│                       API Layer                             │
+│              Node.js / Express · TypeScript                  │
+│     JWT Auth · Role Middleware · Zod Validation · Prisma     │
+└───────────────────────────┬─────────────────────────────────┘
+                            │
+┌───────────────────────────▼─────────────────────────────────┐
+│                     Data Layer                              │
+│              PostgreSQL · Prisma ORM · AuditLog              │
+└─────────────────────────────────────────────────────────────┘
+```
+
+**Runtime:** Backend on port `5000` (ts-node-dev) · Frontend on port `3000` (Turbopack)
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Language | TypeScript (end-to-end) |
+| Frontend | Next.js 15, Tailwind CSS, shadcn/ui |
+| State Management | Zustand (`authStore`, `goalStore`) |
+| HTTP Client | Axios (configured in `lib/axios.ts`) |
+| Backend | Node.js, Express |
+| Validation | Zod (schema-level, frontend + backend) |
+| ORM | Prisma |
+| Database | PostgreSQL |
+| Auth | Stateless JWT, role-persisted sessions |
+
+---
+
+## Repository Structure
+
+```
+AtomAlign/
+├── backend/
+│   └── src/
+│       ├── config/              # DB connection, env parsing
+│       │   ├── db.ts
+│       │   └── env.ts
+│       ├── controllers/         # Route handlers per domain
+│       │   ├── auth.controller.ts
+│       │   ├── goal.controller.ts
+│       │   ├── checkin.controller.ts
+│       │   ├── analytics.controller.ts
+│       │   └── admin.controller.ts
+│       ├── services/            # Business logic layer
+│       │   ├── auth.service.ts
+│       │   ├── goal.service.ts
+│       │   ├── checkin.service.ts
+│       │   ├── analytics.service.ts
+│       │   └── escalation.service.ts
+│       ├── routes/              # Express routers
+│       │   ├── auth.routes.ts
+│       │   ├── goal.routes.ts
+│       │   ├── checkin.routes.ts
+│       │   ├── analytics.routes.ts
+│       │   └── admin.routes.ts
+│       ├── middleware/
+│       │   ├── auth.middleware.ts      # JWT verification
+│       │   ├── role.middleware.ts      # RBAC enforcement
+│       │   ├── error.middleware.ts     # Global error handler
+│       │   └── validation.middleware.ts
+│       ├── utils/
+│       │   ├── jwt.ts
+│       │   ├── validators.ts
+│       │   ├── progressEngine.ts      # UoM scoring logic
+│       │   ├── auditLogger.ts         # Post-lock change tracking
+│       │   └── response.ts
+│       ├── prisma/
+│       │   ├── schema.prisma
+│       │   └── seed.ts
+│       ├── app.ts
+│       └── server.ts
+│
+├── frontend/
+│   └── src/
+│       ├── app/                        # Next.js App Router
+│       │   ├── (auth)/login/
+│       │   ├── dashboard/
+│       │   │   ├── employee/
+│       │   │   ├── manager/
+│       │   │   └── admin/
+│       │   ├── goals/
+│       │   │   ├── create/
+│       │   │   └── [id]/
+│       │   ├── checkins/
+│       │   ├── analytics/
+│       │   └── audit-logs/
+│       ├── components/
+│       │   ├── ui/                     # shadcn/ui base components
+│       │   ├── dashboard/
+│       │   │   ├── StatCard.tsx
+│       │   │   ├── ProgressChart.tsx
+│       │   │   ├── GoalCard.tsx
+│       │   │   └── ActivityFeed.tsx
+│       │   ├── goals/
+│       │   │   ├── GoalForm.tsx        # Dynamic add/remove goal rows
+│       │   │   ├── GoalTable.tsx
+│       │   │   ├── GoalStatusBadge.tsx
+│       │   │   └── WeightageTracker.tsx # Live 100% progress widget
+│       │   ├── checkins/
+│       │   └── layout/
+│       │       ├── Sidebar.tsx
+│       │       ├── Navbar.tsx
+│       │       └── DashboardShell.tsx
+│       ├── hooks/
+│       │   ├── useAuth.ts
+│       │   ├── useGoals.ts
+│       │   └── useCheckins.ts
+│       ├── lib/
+│       │   ├── axios.ts
+│       │   ├── validators.ts          # Zod schemas (mirrors backend)
+│       │   ├── constants.ts
+│       │   └── progressEngine.ts      # Client-side score preview
+│       ├── services/
+│       │   ├── auth.service.ts
+│       │   ├── goal.service.ts
+│       │   ├── checkin.service.ts
+│       │   └── analytics.service.ts
+│       ├── store/
+│       │   ├── authStore.ts
+│       │   └── goalStore.ts
+│       ├── types/
+│       │   ├── auth.ts
+│       │   ├── goals.ts
+│       │   └── analytics.ts
+│       └── middleware.ts              # Client-side route guards
+│
+├── docs/
+├── .gitignore
+└── README.md
+```
+
+---
+
+## Core Modules
+
+### Authentication & RBAC
+JWT-based stateless auth with three roles: `EMPLOYEE`, `MANAGER`, `ADMIN`. Every API route is guarded by `auth.middleware.ts` (token verification) followed by `role.middleware.ts` (permission scoping). On the frontend, `middleware.ts` enforces client-side route guards, and `useAuth.ts` exposes the Zustand-backed auth state across the app.
+
+### Goal Lifecycle Engine
+Goals follow a strict state machine: `DRAFT → SUBMITTED → APPROVED (LOCKED)` or `DRAFT (returned for rework)`.
+
+Validation enforced by Zod on both layers:
+- Weightage per goal: **≥ 10%**
+- Total weightage across all goals: **= 100%** (exact)
+- Goals per employee per cycle: **≤ 8**
+
+`GoalForm.tsx` handles dynamic goal rows with a live `WeightageTracker.tsx` widget so employees see their running total before submission. On the manager side, the approval queue allows inline edits to targets and weightages before locking.
+
+### Progress Scoring Engine (`progressEngine.ts`)
+Exists on both backend (`utils/`) and frontend (`lib/`) for server-computed scores and client-side previews respectively.
+
+| UoM Type | Formula | Use Case |
+|---|---|---|
+| `NUMERIC_MIN` / `PERCENT_MIN` | `Achievement ÷ Target` | Revenue, Sales |
+| `NUMERIC_MAX` / `PERCENT_MAX` | `Target ÷ Achievement` | TAT, Cost, Attrition |
+| `TIMELINE` | Completion date vs. Deadline | Project delivery |
+| `ZERO_BASED` | `0 → 100%`, else `0%` | Safety incidents |
+
+### Quarterly Check-in Module
+System-enforced update windows. Employees log actuals; managers add structured check-in comments via the check-in controller. All interactions are scoped to the active quarter.
+
+| Period | Window | Action |
+|---|---|---|
+| Goal Setting | 1st May | Creation, Submission & Approval |
+| Q1 | July | Planned vs. Actual |
+| Q2 | October | Planned vs. Actual |
+| Q3 | January | Planned vs. Actual |
+| Q4 / Annual | March / April | Final Achievement Capture |
+
+### Audit & Governance Layer
+`auditLogger.ts` intercepts all goal mutations that occur post-lock and writes to the `AuditLog` table — capturing actor, field changed, old value, new value, and timestamp. The Admin dashboard surfaces these logs in `app/audit-logs/` and exposes completion-rate heatmaps via `analytics.service.ts`.
+
+### Escalation Service (`escalation.service.ts`)
+Goals sitting in a manager's approval queue for **> 7 days** are automatically escalated to Admin. The Admin governance dashboard includes a manual sweep trigger for ad-hoc escalation runs alongside real-time system stats (submission rates, active escalations, employee count).
+
+### Shared Goals
+Admins or managers can push a departmental KPI to multiple employees simultaneously. Recipients can only modify weightage — title and target are read-only. Achievement entries by the primary owner propagate to all linked goal sheets via the goal service.
+
+---
+
+## API Routes
+
+| Domain | Prefix | Controller |
+|---|---|---|
+| Auth | `/api/auth` | `auth.controller.ts` |
+| Goals | `/api/goals` | `goal.controller.ts` |
+| Check-ins | `/api/checkins` | `checkin.controller.ts` |
+| Analytics | `/api/analytics` | `analytics.controller.ts` |
+| Admin | `/api/admin` | `admin.controller.ts` |
+
+---
+
+## Local Setup
+
+**Prerequisites:** Node.js v18+, PostgreSQL instance running.
+
+```bash
+# Clone
+git clone https://github.com/li1code/AtomAlign.git
+cd AtomAlign
+
+# Backend
+cd backend
+npm install
+cp .env.example .env          # Set DATABASE_URL and JWT_SECRET
+npx prisma migrate dev
+npx prisma db seed            # Seed demo users across all 3 roles
+npm run dev                   # http://localhost:5000
+
+# Frontend (new terminal)
+cd frontend
+npm install
+npm run dev                   # http://localhost:3000
+```
+
+### Demo Credentials
+
+| Role | Email | Password |
+|---|---|---|
+| Employee | employee@atomalign.com | `demo1234` |
+| Manager | manager@atomalign.com | `demo1234` |
+| Admin | admin@atomalign.com | `demo1234` |
+
+---
+
+## Evaluation Coverage (AtomQuest BRD)
+
+| Criterion | Implementation |
+|---|---|
+| Phase 1 — Goal Creation & Approval | Goal lifecycle, Zod validation, manager approval queue, lock mechanism |
+| Phase 2 — Quarterly Tracking | Check-in module, UoM progress engine, status logging |
+| RBAC | Three-role system enforced at middleware and UI layer |
+| Shared Goals | KPI push with read-only title/target and synced achievements |
+| Audit Trail | `auditLogger.ts` → `AuditLog` table, surfaced in admin panel |
+| Reporting | Analytics service, exportable achievement data, completion dashboard |
+| Escalation (Bonus) | `escalation.service.ts` with 7-day rule and admin sweep trigger |
+
+---
+
+*Submitted for AtomQuest Hackathon 1.0*
