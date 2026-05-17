@@ -1,0 +1,189 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  EMPLOYEE
+  MANAGER
+  ADMIN
+}
+
+enum GoalStatus {
+  DRAFT
+  SUBMITTED
+  UNDER_REVIEW
+  APPROVED_LOCKED
+  FINALIZED
+}
+
+enum UOMType {
+  NUMERIC_MIN
+  NUMERIC_MAX
+  PERCENT_MIN
+  PERCENT_MAX
+  TIMELINE
+  ZERO_BASED
+}
+
+enum Quarter {
+  Q1
+  Q2
+  Q3
+  Q4
+  ANNUAL
+}
+
+enum UpdateStatus {
+  NOT_STARTED
+  ON_TRACK
+  COMPLETED
+}
+
+model Department {
+  id    String @id @default(cuid())
+  name  String @unique
+  users User[]
+}
+
+model User {
+  id           String      @id @default(cuid())
+  name         String
+  email        String      @unique
+  password     String
+  role         Role        @default(EMPLOYEE)
+  departmentId String?
+  department   Department? @relation(fields: [departmentId], references: [id])
+  managerId    String?
+  manager      User?       @relation("ManagerRelation", fields: [managerId], references: [id])
+  subordinates User[]      @relation("ManagerRelation")
+
+  goals        Goal[]
+  approvals    Approval[]
+  auditLogs    AuditLog[]
+  checkins     Checkin[]
+  escalations  Escalation[]
+
+  createdAt    DateTime @default(now())
+}
+
+model GoalCycle {
+  id        String   @id @default(cuid())
+  name      String   // e.g., "FY2026"
+  startDate DateTime
+  endDate   DateTime
+  isActive  Boolean  @default(false)
+  goals     Goal[]
+}
+
+model Goal {
+  id           String      @id @default(cuid())
+  title        String
+  description  String
+  thrustArea   String
+  target       Float
+  weightage    Float
+  status       GoalStatus  @default(DRAFT)
+  uomType      UOMType
+  isLocked     Boolean     @default(false)
+
+  employeeId   String
+  employee     User        @relation(fields: [employeeId], references: [id])
+  cycleId      String?
+  cycle        GoalCycle?  @relation(fields: [cycleId], references: [id])
+
+  updates      GoalUpdate[]
+  checkins     Checkin[]
+  approvals    Approval[]
+  auditLogs    AuditLog[]
+
+  // Shared Goals
+  sharedGoalId String?
+  sharedGoal   SharedGoal? @relation(fields: [sharedGoalId], references: [id])
+
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+}
+
+model SharedGoal {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  thrustArea  String
+  target      Float
+  uomType     UOMType
+
+  linkedGoals Goal[]
+
+  createdAt   DateTime @default(now())
+}
+
+model GoalUpdate {
+  id                String       @id @default(cuid())
+  goalId            String
+  goal              Goal         @relation(fields: [goalId], references: [id])
+  quarter           Quarter
+  plannedTarget     Float
+  actualAchievement Float
+  status            UpdateStatus @default(NOT_STARTED)
+  
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+
+  @@unique([goalId, quarter])
+}
+
+model Checkin {
+  id             String   @id @default(cuid())
+  goalId         String
+  goal           Goal     @relation(fields: [goalId], references: [id])
+  managerId      String
+  manager        User     @relation(fields: [managerId], references: [id])
+  quarter        Quarter
+  managerComment String
+  
+  createdAt      DateTime @default(now())
+
+  @@unique([goalId, quarter])
+}
+
+model Approval {
+  id        String   @id @default(cuid())
+  goalId    String
+  goal      Goal     @relation(fields: [goalId], references: [id])
+  managerId String
+  manager   User     @relation(fields: [managerId], references: [id])
+  status    String   // e.g., APPROVED, REJECTED
+  comment   String?
+  
+  createdAt DateTime @default(now())
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  goalId    String
+  goal      Goal     @relation(fields: [goalId], references: [id])
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  action    String   // e.g., "TARGET_CHANGED"
+  before    String?
+  after     String?
+  
+  createdAt DateTime @default(now())
+}
+
+model Escalation {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+  reason     String
+  isResolved Boolean  @default(false)
+  
+  createdAt  DateTime @default(now())
+}
