@@ -303,13 +303,13 @@ export default function AdminDashboard() {
                       <div className="text-[9px] uppercase tracking-wider text-yellow-600 dark:text-yellow-500 font-mono font-bold mt-1.5">System Admin</div>
                     </div>
                     <button 
-                      onClick={() => setProfileOpen(false)}
+                      onClick={() => router.push('/dashboard/profile')}
                       className="dropdown-item"
                     >
                       <i className="ti ti-user nav-ico" /> Profile Details
                     </button>
                     <button 
-                      onClick={() => setProfileOpen(false)}
+                      onClick={() => router.push('/dashboard/settings')}
                       className="dropdown-item"
                     >
                       <i className="ti ti-settings nav-ico" /> Settings

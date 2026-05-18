@@ -114,13 +114,13 @@ export default function ManagerDashboard() {
                       <div className="text-[9px] uppercase tracking-wider text-[#185FA5] dark:text-[#5AA8F0] font-mono font-bold mt-1.5">{user?.department || 'Engineering'} Manager</div>
                     </div>
                     <button 
-                      onClick={() => setProfileOpen(false)}
+                      onClick={() => router.push('/dashboard/profile')}
                       className="dropdown-item"
                     >
                       <i className="ti ti-user nav-ico" /> Profile Details
                     </button>
                     <button 
-                      onClick={() => setProfileOpen(false)}
+                      onClick={() => router.push('/dashboard/settings')}
                       className="dropdown-item"
                     >
                       <i className="ti ti-settings nav-ico" /> Settings

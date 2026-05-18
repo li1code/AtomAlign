@@ -48,7 +48,7 @@ export default function LoginPage() {
             <input
               type="email"
               required
-              className="w-full px-4 py-3 bg-zinc-800/50 border border-zinc-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500 transition-all text-white placeholder-zinc-500"
+              className="w-full px-4 py-3 bg-transparent border border-zinc-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500 transition-all text-white placeholder-zinc-500"
               placeholder="name@atomberg.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -60,7 +60,7 @@ export default function LoginPage() {
             <input
               type="password"
               required
-              className="w-full px-4 py-3 bg-zinc-800/50 border border-zinc-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500 transition-all text-white placeholder-zinc-500"
+              className="w-full px-4 py-3 bg-transparent border border-zinc-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500 transition-all text-white placeholder-zinc-500"
               placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
