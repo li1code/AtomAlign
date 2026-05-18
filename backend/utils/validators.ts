@@ -14,7 +14,7 @@ export const goalSubmissionSchema = z.array(goalSchema).min(1).max(8, 'Maximum o
 export const validateGoalSubmission = (goals: z.infer<typeof goalSubmissionSchema>) => {
   const result = goalSubmissionSchema.safeParse(goals);
   if (!result.success) {
-    throw new Error(result.error.errors[0].message);
+    throw new Error(result.error.issues[0].message);
   }
 
   const totalWeightage = goals.reduce((sum, g) => sum + g.weightage, 0);

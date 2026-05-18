@@ -35,6 +35,39 @@ export const createQuarterlyUpdate = async (employeeId: string, goalId: string, 
     }
   });
 
+  // If the goal is a primary shared goal, propagate the update to all linked goals
+  if (goal.isShared && goal.isPrimary && goal.sharedGoalId) {
+    const linkedGoals = await prisma.goal.findMany({
+      where: {
+        sharedGoalId: goal.sharedGoalId,
+        id: { not: goal.id }
+      }
+    });
+
+    for (const lg of linkedGoals) {
+      await prisma.goalUpdate.upsert({
+        where: {
+          goalId_quarter: {
+            goalId: lg.id,
+            quarter: data.quarter as Quarter
+          }
+        },
+        update: {
+          actualAchievement: data.actualAchievement,
+          status: data.status as UpdateStatus,
+          plannedTarget: lg.target
+        },
+        create: {
+          goalId: lg.id,
+          quarter: data.quarter as Quarter,
+          plannedTarget: lg.target,
+          actualAchievement: data.actualAchievement,
+          status: data.status as UpdateStatus
+        }
+      });
+    }
+  }
+
   return { update, progress };
 };
 

@@ -34,7 +34,7 @@ export const getMyGoals = async (req: AuthRequest, res: Response): Promise<void>
 export const updateGoal = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    const result = await goalService.updateGoal(req.user!.id, id, req.body);
+    const result = await goalService.updateGoal(req.user!.id, id as string, req.body);
     res.json({ message: 'Goal updated successfully', goal: result });
   } catch (error: any) {
     res.status(400).json({ message: error.message });

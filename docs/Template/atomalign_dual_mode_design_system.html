@@ -1,0 +1,662 @@
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;500;600;700&display=swap');
+
+.aa-ds { font-family: 'Syne', sans-serif; display: flex; flex-direction: column; gap: 0; }
+
+.mode-toggle-bar {
+  display: flex; gap: 0; border-radius: 12px; overflow: hidden;
+  border: 0.5px solid rgba(0,0,0,0.08); margin-bottom: 28px;
+}
+.mode-tab {
+  flex: 1; padding: 12px 16px; cursor: pointer;
+  font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
+  border: none; text-align: center; font-weight: 500; transition: background 0.2s, color 0.2s;
+}
+.mode-tab.light { background: #FFFFFF; color: #111; border-right: 0.5px solid rgba(0,0,0,0.08); }
+.mode-tab.light.active { background: #FFB800; color: #0D0D0D; }
+.mode-tab.dark { background: #141414; color: #A8A8A0; }
+.mode-tab.dark.active { background: #FFB800; color: #0D0D0D; }
+
+.panel { display: none; flex-direction: column; gap: 28px; }
+.panel.visible { display: flex; }
+
+.sec-label {
+  font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.14em;
+  text-transform: uppercase; margin-bottom: 12px;
+  display: flex; align-items: center; gap: 8px;
+}
+.sec-label::after { content: ''; flex: 1; height: 1px; }
+
+.L .sec-label { color: #888; }
+.L .sec-label::after { background: #E8E8E8; }
+.D .sec-label { color: #A8A8A0; }
+.D .sec-label::after { background: rgba(255,255,255,0.07); }
+
+.pal-grid { display: grid; grid-template-columns: repeat(6,1fr); gap: 6px; }
+.swatch { border-radius: 8px; overflow: hidden; }
+.sw-bar { height: 36px; }
+.sw-info { padding: 6px 8px; }
+.sw-name { font-family: 'DM Mono', monospace; font-size: 9px; }
+.sw-hex { font-family: 'DM Mono', monospace; font-size: 9px; font-weight: 500; }
+.L .swatch { background: #F7F7F5; }
+.L .sw-name { color: #888; }
+.L .sw-hex { color: #222; }
+.D .swatch { background: #1A1A1A; }
+.D .sw-name { color: #A8A8A0; }
+.D .sw-hex { color: #F5F5F5; }
+
+.type-stack { display: flex; flex-direction: column; gap: 8px; }
+.type-row { display: flex; align-items: baseline; gap: 14px; padding: 10px 14px; border-radius: 10px; }
+.L .type-row { background: #F7F7F5; }
+.D .type-row { background: #141414; border: 0.5px solid rgba(255,255,255,0.07); }
+.type-lbl { font-family: 'DM Mono', monospace; font-size: 10px; width: 96px; flex-shrink: 0; }
+.L .type-lbl { color: #888; }
+.D .type-lbl { color: #A8A8A0; }
+
+.badge-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.badge { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.07em; text-transform: uppercase; padding: 4px 10px; border-radius: 4px; font-weight: 500; }
+
+.L .badge-fy { background: #FFB800; color: #0D0D0D; }
+.L .badge-draft { background: #F0EFEB; color: #5F5E5A; border: 0.5px solid #D3D1C7; }
+.L .badge-submitted { background: #FEF4DC; color: #854F0B; border: 0.5px solid #FAC775; }
+.L .badge-locked { background: #FEF4DC; color: #854F0B; border: 0.5px solid #FAC775; }
+.L .badge-approved { background: #EAF3DE; color: #3B6D11; border: 0.5px solid #97C459; }
+.L .badge-overdue { background: #FCEBEB; color: #A32D2D; border: 0.5px solid #F09595; }
+
+.D .badge-fy { background: #FFB800; color: #0D0D0D; }
+.D .badge-draft { background: rgba(255,255,255,0.06); color: #A8A8A0; border: 0.5px solid rgba(255,255,255,0.12); }
+.D .badge-submitted { background: rgba(255,184,0,0.12); color: #FFB800; border: 0.5px solid rgba(255,184,0,0.25); }
+.D .badge-locked { background: rgba(226,154,26,0.1); color: #E29A1A; border: 0.5px solid rgba(226,154,26,0.25); }
+.D .badge-approved { background: rgba(61,191,122,0.1); color: #3DBF7A; border: 0.5px solid rgba(61,191,122,0.25); }
+.D .badge-overdue { background: rgba(226,75,74,0.1); color: #E24B4A; border: 0.5px solid rgba(226,75,74,0.25); }
+
+.role-pill { display: inline-flex; align-items: center; gap: 6px; font-family: 'DM Mono', monospace; font-size: 10px; padding: 3px 10px; border-radius: 20px; letter-spacing: 0.08em; text-transform: uppercase; }
+.role-dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+.L .role-admin { background: #FEF4DC; color: #854F0B; border: 0.5px solid #FAC775; }
+.L .role-manager { background: #E6F1FB; color: #185FA5; border: 0.5px solid #85B7EB; }
+.L .role-employee { background: #EAF3DE; color: #3B6D11; border: 0.5px solid #97C459; }
+.D .role-admin { background: rgba(255,184,0,0.12); color: #FFB800; border: 0.5px solid rgba(255,184,0,0.3); }
+.D .role-manager { background: rgba(55,138,221,0.1); color: #5AA8F0; border: 0.5px solid rgba(55,138,221,0.25); }
+.D .role-employee { background: rgba(61,191,122,0.1); color: #3DBF7A; border: 0.5px solid rgba(61,191,122,0.25); }
+
+.metric-grid { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 8px; }
+.metric-card { border-radius: 12px; padding: 14px; position: relative; overflow: hidden; }
+.metric-card::before { content: ''; position: absolute; top:0; left:0; right:0; height: 2px; }
+.metric-card.accent::before { background: #FFB800; }
+.metric-card.danger::before { background: #E24B4A; }
+.metric-card.neutral::before { background: transparent; }
+.metric-lbl { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 6px; }
+.metric-val { font-family: 'Syne', sans-serif; font-size: 26px; font-weight: 700; }
+.metric-ico { position: absolute; right: 12px; top: 12px; font-size: 18px; opacity: 0.2; }
+
+.L .metric-card { background: #FFFFFF; border: 0.5px solid #E8E8E4; }
+.L .metric-card.danger { background: #FFFAFA; border: 0.5px solid #F7C1C1; }
+.L .metric-lbl { color: #888; }
+.L .metric-val { color: #111; }
+.L .metric-val.amber { color: #854F0B; }
+.L .metric-val.danger { color: #A32D2D; }
+.L .metric-ico { color: #111; }
+
+.D .metric-card { background: #1A1A1A; border: 0.5px solid rgba(255,255,255,0.07); }
+.D .metric-lbl { color: #A8A8A0; }
+.D .metric-val { color: #F5F5F5; }
+.D .metric-val.amber { color: #FFB800; }
+.D .metric-val.danger { color: #E24B4A; }
+.D .metric-ico { color: #F5F5F5; }
+
+.goal-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; }
+.goal-card { border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 8px; }
+.L .goal-card { background: #FFFFFF; border: 0.5px solid #E8E8E4; }
+.D .goal-card { background: #1A1A1A; border: 0.5px solid rgba(255,255,255,0.07); }
+.goal-ttl { font-size: 13px; font-weight: 600; }
+.L .goal-ttl { color: #111; }
+.D .goal-ttl { color: #F5F5F5; }
+.goal-meta { font-family: 'DM Mono', monospace; font-size: 10px; }
+.L .goal-meta { color: #888; }
+.D .goal-meta { color: #A8A8A0; }
+.goal-desc { font-size: 11px; line-height: 1.5; }
+.L .goal-desc { color: #555; }
+.D .goal-desc { color: #A8A8A0; }
+.goal-footer { display: flex; align-items: center; justify-content: space-between; }
+.goal-wt { font-family: 'DM Mono', monospace; font-size: 11px; color: #FFB800; }
+.unlock-btn { font-family: 'DM Mono', monospace; font-size: 10px; padding: 4px 9px; border-radius: 4px; cursor: pointer; letter-spacing: 0.05em; border: none; }
+.L .unlock-btn { background: #FEF4DC; color: #854F0B; border: 0.5px solid #FAC775; }
+.D .unlock-btn { background: rgba(255,184,0,0.12); color: #FFB800; border: 0.5px solid rgba(255,184,0,0.3); }
+.prog-track { height: 3px; border-radius: 2px; margin-top: 2px; }
+.L .prog-track { background: #E8E8E4; }
+.D .prog-track { background: rgba(255,255,255,0.1); }
+.prog-fill { height: 100%; border-radius: 2px; background: #FFB800; }
+
+.approval-card { border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+.L .approval-card { background: #FFFFFF; border: 0.5px solid #E8E8E4; }
+.D .approval-card { background: #1A1A1A; border: 0.5px solid rgba(255,255,255,0.07); }
+.approval-details { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; border-radius: 8px; overflow: hidden; }
+.L .approval-details { background: #E8E8E4; }
+.D .approval-details { background: rgba(255,255,255,0.07); }
+.appr-det { padding: 10px 12px; }
+.L .appr-det { background: #F7F7F5; }
+.D .appr-det { background: #141414; }
+.appr-det-lbl { font-family: 'DM Mono', monospace; font-size: 9px; margin-bottom: 3px; }
+.L .appr-det-lbl { color: #888; }
+.D .appr-det-lbl { color: #A8A8A0; }
+.appr-det-val { font-family: 'DM Mono', monospace; font-size: 14px; font-weight: 500; color: #FFB800; }
+.L .appr-det-val { color: #854F0B; }
+.D .appr-det-val { color: #FFB800; }
+.btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.btn-approve { padding: 9px; border-radius: 8px; border: none; cursor: pointer; font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 6px; background: #3DBF7A; color: #0D1F14; }
+.btn-sendback { padding: 9px; border-radius: 8px; cursor: pointer; font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 6px; }
+.L .btn-sendback { background: #FCEBEB; color: #A32D2D; border: 0.5px solid #F09595; }
+.D .btn-sendback { background: rgba(226,75,74,0.1); color: #E24B4A; border: 0.5px solid rgba(226,75,74,0.3); }
+
+.esc-card { border-radius: 12px; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.L .esc-card { background: #FFFAFA; border: 0.5px solid #F7C1C1; }
+.D .esc-card { background: rgba(226,75,74,0.08); border: 0.5px solid rgba(226,75,74,0.2); }
+.esc-name { font-size: 13px; font-weight: 600; margin-bottom: 3px; }
+.L .esc-name { color: #111; }
+.D .esc-name { color: #F5F5F5; }
+.esc-desc { font-size: 11px; }
+.L .esc-desc { color: #A32D2D; }
+.D .esc-desc { color: rgba(226,75,74,0.8); }
+
+.dash-shell { border-radius: 16px; overflow: hidden; }
+.L .dash-shell { background: #F4F4F0; border: 0.5px solid #E0E0DC; }
+.D .dash-shell { background: #0D0D0D; border: 0.5px solid rgba(255,255,255,0.07); }
+.dash-topbar { padding: 12px 18px; display: flex; align-items: center; justify-content: space-between; }
+.L .dash-topbar { background: #FFFFFF; border-bottom: 0.5px solid #E8E8E4; }
+.D .dash-topbar { background: #111; border-bottom: 0.5px solid rgba(255,255,255,0.07); }
+.dash-brand { display: flex; align-items: center; gap: 8px; }
+.dash-logo { width: 22px; height: 22px; background: #FFB800; border-radius: 6px; display: flex; align-items: center; justify-content: center; }
+.dash-logo-inner { width: 8px; height: 8px; border-radius: 2px; background: #0D0D0D; }
+.dash-name { font-size: 14px; font-weight: 700; letter-spacing: -0.02em; }
+.L .dash-name { color: #111; }
+.D .dash-name { color: #F5F5F5; }
+.dash-body { display: grid; grid-template-columns: 175px 1fr; }
+.dash-sidebar { padding: 14px 10px; }
+.L .dash-sidebar { background: #FFFFFF; border-right: 0.5px solid #E8E8E4; }
+.D .dash-sidebar { background: #111; border-right: 0.5px solid rgba(255,255,255,0.07); }
+.dash-content { padding: 18px; display: flex; flex-direction: column; gap: 14px; }
+.dash-pg-title { font-size: 17px; font-weight: 700; }
+.L .dash-pg-title { color: #111; }
+.D .dash-pg-title { color: #F5F5F5; }
+.dash-pg-sub { font-size: 11px; margin-top: 2px; }
+.L .dash-pg-sub { color: #888; }
+.D .dash-pg-sub { color: #A8A8A0; }
+
+.nav-item { display: flex; align-items: center; gap: 9px; padding: 8px 10px; border-radius: 8px; font-size: 12px; cursor: pointer; margin-bottom: 2px; }
+.L .nav-item { color: #555; }
+.L .nav-item:hover { background: #F4F4F0; color: #111; }
+.L .nav-item.active { background: #FEF4DC; color: #854F0B; }
+.D .nav-item { color: #A8A8A0; }
+.D .nav-item:hover { background: rgba(255,255,255,0.04); color: #F5F5F5; }
+.D .nav-item.active { background: rgba(255,184,0,0.1); color: #FFB800; }
+.nav-ico { font-size: 14px; width: 16px; }
+.nav-sec { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; padding: 4px 10px; margin-top: 6px; margin-bottom: 2px; }
+.L .nav-sec { color: #BBBBBB; }
+.D .nav-sec { color: #555; }
+.nav-div { height: 1px; margin: 8px 0; }
+.L .nav-div { background: #E8E8E4; }
+.D .nav-div { background: rgba(255,255,255,0.07); }
+.action-btn { display: flex; align-items: center; gap: 7px; padding: 7px 10px; border-radius: 8px; font-size: 11px; cursor: pointer; width: 100%; margin-bottom: 5px; border: none; }
+.L .action-btn { color: #555; background: #F7F7F5; border: 0.5px solid #E0E0DC; }
+.D .action-btn { color: #A8A8A0; background: #1A1A1A; border: 0.5px solid rgba(255,255,255,0.07); }
+.action-btn.primary { background: #FFB800; color: #0D0D0D; border: none; font-weight: 600; }
+
+.donut-wrap { display: flex; align-items: center; gap: 16px; }
+.legend-item { display: flex; align-items: center; gap: 6px; font-family: 'DM Mono', monospace; font-size: 10px; margin-bottom: 5px; }
+.L .legend-item { color: #555; }
+.D .legend-item { color: #A8A8A0; }
+.ldot { width: 8px; height: 8px; border-radius: 2px; }
+
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.block { border-radius: 12px; padding: 14px; }
+.L .block { background: #FFFFFF; border: 0.5px solid #E8E8E4; }
+.D .block { background: #1A1A1A; border: 0.5px solid rgba(255,255,255,0.07); }
+.block-ttl { font-size: 13px; font-weight: 600; margin-bottom: 10px; }
+.L .block-ttl { color: #111; }
+.D .block-ttl { color: #F5F5F5; }
+
+.ok-banner { border-radius: 8px; padding: 8px 12px; font-family: 'DM Mono', monospace; font-size: 11px; margin-top: 10px; }
+.L .ok-banner { background: #EAF3DE; color: #3B6D11; border: 0.5px solid #97C459; }
+.D .ok-banner { background: rgba(61,191,122,0.1); color: #3DBF7A; border: 0.5px solid rgba(61,191,122,0.25); }
+
+.watermark { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.08em; text-align: center; padding: 6px 0 2px; }
+.L .watermark { color: #BBB; }
+.D .watermark { color: #444; }
+
+.comment-box { border-radius: 8px; padding: 10px 12px; }
+.L .comment-box { background: #F7F7F5; border: 0.5px solid #E0E0DC; }
+.D .comment-box { background: #141414; border: 0.5px solid rgba(255,255,255,0.07); }
+.comment-lbl { font-family: 'DM Mono', monospace; font-size: 9px; margin-bottom: 4px; }
+.L .comment-lbl { color: #888; }
+.D .comment-lbl { color: #A8A8A0; }
+.comment-ph { font-size: 12px; }
+.L .comment-ph { color: #BBBBBB; }
+.D .comment-ph { color: rgba(168,168,160,0.4); }
+</style>
+
+<h2 class="sr-only">AtomAlign dual-mode design system showing light and dark theme components</h2>
+
+<div class="aa-ds">
+  <div class="mode-toggle-bar">
+    <button class="mode-tab light active" onclick="switchMode('light')">☀ Light Mode — Pearl White</button>
+    <button class="mode-tab dark" onclick="switchMode('dark')">◐ Dark Mode — Midnight Black</button>
+  </div>
+
+  <div id="panel-light" class="panel L visible">
+    <div>
+      <div class="sec-label">01 / Color palette — light mode</div>
+      <div class="pal-grid">
+        <div class="swatch L"><div class="sw-bar" style="background:#FFFFFF; border:0.5px solid #E0E0DC;"></div><div class="sw-info"><div class="sw-name">Pearl White</div><div class="sw-hex">#FFFFFF</div></div></div>
+        <div class="swatch L"><div class="sw-bar" style="background:#F7F7F5;"></div><div class="sw-info"><div class="sw-name">Surface</div><div class="sw-hex">#F7F7F5</div></div></div>
+        <div class="swatch L"><div class="sw-bar" style="background:#F0EFEB;"></div><div class="sw-info"><div class="sw-name">Mist</div><div class="sw-hex">#F0EFEB</div></div></div>
+        <div class="swatch L"><div class="sw-bar" style="background:#FFB800;"></div><div class="sw-info"><div class="sw-name">Amber</div><div class="sw-hex">#FFB800</div></div></div>
+        <div class="swatch L"><div class="sw-bar" style="background:#111111;"></div><div class="sw-info"><div class="sw-name">Ink</div><div class="sw-hex">#111111</div></div></div>
+        <div class="swatch L"><div class="sw-bar" style="background:#888888;"></div><div class="sw-info"><div class="sw-name">Stone</div><div class="sw-hex">#888888</div></div></div>
+      </div>
+      <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:6px; margin-top:6px;">
+        <div class="swatch L" style="flex-direction:row; align-items:center; gap:10px; padding:8px 12px; display:flex;"><div class="sw-bar" style="width:28px;height:28px;flex-shrink:0;border-radius:6px;background:#3DBF7A;"></div><div><div class="sw-name" style="color:#888;">Success</div><div class="sw-hex" style="color:#111;">#3DBF7A</div></div></div>
+        <div class="swatch L" style="flex-direction:row; align-items:center; gap:10px; padding:8px 12px; display:flex;"><div class="sw-bar" style="width:28px;height:28px;flex-shrink:0;border-radius:6px;background:#E24B4A;"></div><div><div class="sw-name" style="color:#888;">Danger</div><div class="sw-hex" style="color:#111;">#E24B4A</div></div></div>
+        <div class="swatch L" style="flex-direction:row; align-items:center; gap:10px; padding:8px 12px; display:flex;"><div class="sw-bar" style="width:28px;height:28px;flex-shrink:0;border-radius:6px;background:#E29A1A;"></div><div><div class="sw-name" style="color:#888;">Warning</div><div class="sw-hex" style="color:#111;">#E29A1A</div></div></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="sec-label">02 / Typography</div>
+      <div class="type-stack">
+        <div class="type-row L"><span class="type-lbl L">H1 · 28px 700</span><span style="font-family:'Syne',sans-serif;font-size:26px;font-weight:700;color:#111;">System Administration</span></div>
+        <div class="type-row L"><span class="type-lbl L">H2 · 18px 600</span><span style="font-family:'Syne',sans-serif;font-size:18px;font-weight:600;color:#111;">Organizational Goal Search</span></div>
+        <div class="type-row L"><span class="type-lbl L">Eyebrow · Mono</span><span style="font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#FFB800;">Active Cycle: FY2026</span></div>
+        <div class="type-row L"><span class="type-lbl L">Body · 14px</span><span style="font-size:13px;color:#555;line-height:1.5;">Optimize backend Express query routing to improve latency by 20%.</span></div>
+        <div class="type-row L"><span class="type-lbl L">Data · Mono</span><span style="font-family:'DM Mono',monospace;font-size:12px;color:#111;">PERCENT_MIN → 100 · Weightage: 30%</span></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="sec-label">03 / Badges & roles</div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div class="badge-row">
+          <span class="badge badge-fy L">FY2026</span>
+          <span class="badge badge-draft L">Draft</span>
+          <span class="badge badge-submitted L">Submitted</span>
+          <span class="badge badge-locked L">Locked</span>
+          <span class="badge badge-approved L">Approved</span>
+          <span class="badge badge-overdue L">Overdue</span>
+        </div>
+        <div class="badge-row">
+          <span class="role-pill role-admin L"><span class="role-dot"></span>Secure Governance</span>
+          <span class="role-pill role-manager L"><span class="role-dot"></span>L1 Manager</span>
+          <span class="role-pill role-employee L"><span class="role-dot"></span>Employee</span>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="sec-label">04 / Metric cards</div>
+      <div class="metric-grid">
+        <div class="metric-card neutral L"><div class="metric-lbl L">Employees</div><div class="metric-val">3</div><i class="ti ti-users metric-ico" aria-hidden="true"></i></div>
+        <div class="metric-card accent L"><div class="metric-lbl L">Goal Submission</div><div class="metric-val amber L">58%</div><i class="ti ti-target metric-ico" aria-hidden="true"></i></div>
+        <div class="metric-card danger L"><div class="metric-lbl L">Pending Approvals</div><div class="metric-val danger L">3</div><i class="ti ti-alert-triangle metric-ico" aria-hidden="true"></i></div>
+        <div class="metric-card danger L"><div class="metric-lbl L">Active Escalations</div><div class="metric-val danger L">1</div><i class="ti ti-flame metric-ico" aria-hidden="true"></i></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="sec-label">05 / Goal lifecycle cards</div>
+      <div class="goal-grid">
+        <div class="goal-card L">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
+            <div class="goal-ttl L">Core Engine Optimization</div>
+            <span class="badge badge-draft L">Draft</span>
+          </div>
+          <div class="goal-meta L">Employee A · Engineering</div>
+          <div class="goal-desc L">Optimize backend Express query routing to improve latency by 20%.</div>
+          <div class="prog-track L"><div class="prog-fill" style="width:0%"></div></div>
+          <div class="goal-footer"><span class="goal-wt" style="color:#854F0B;">Weightage 30%</span></div>
+        </div>
+        <div class="goal-card L">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
+            <div class="goal-ttl L">Design Library Alignment</div>
+            <span class="badge badge-locked L">Locked</span>
+          </div>
+          <div class="goal-meta L">Employee C · Product</div>
+          <div class="goal-desc L">Align design system guidelines with active brand specifications.</div>
+          <div class="prog-track L"><div class="prog-fill" style="width:65%;background:#E29A1A;"></div></div>
+          <div class="goal-footer"><span class="goal-wt" style="color:#854F0B;">Weightage 30%</span><button class="unlock-btn L"><i class="ti ti-lock-open" style="font-size:10px;" aria-hidden="true"></i> Unlock Sheet</button></div>
+        </div>
+        <div class="goal-card L">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
+            <div class="goal-ttl L">Automated E2E Suite</div>
+            <span class="badge badge-approved L">Approved</span>
+          </div>
+          <div class="goal-meta L">Employee B · Engineering</div>
+          <div class="goal-desc L">Implement end-to-end regression test scripts for portal onboarding.</div>
+          <div class="prog-track L"><div class="prog-fill" style="width:100%;background:#3DBF7A;"></div></div>
+          <div class="goal-footer"><span class="goal-wt" style="color:#854F0B;">Weightage 40%</span></div>
+        </div>
+        <div class="goal-card L">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
+            <div class="goal-ttl L">Bug Escape Rate Reduction</div>
+            <span class="badge badge-submitted L">Submitted</span>
+          </div>
+          <div class="goal-meta L">Employee B · Engineering</div>
+          <div class="goal-desc L">Minimize production bug escape rate below 5% through robust validation.</div>
+          <div class="prog-track L"><div class="prog-fill" style="width:45%;"></div></div>
+          <div class="goal-footer"><span class="goal-wt" style="color:#854F0B;">Weightage 30%</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div>
+        <div class="sec-label">06 / Manager approval</div>
+        <div class="approval-card L">
+          <div>
+            <div style="font-size:14px;font-weight:600;color:#111;">Prisma Cache Service</div>
+            <div style="font-family:'DM Mono',monospace;font-size:10px;color:#888;margin-top:3px;">Employee A · Engineering</div>
+            <div style="font-size:12px;color:#555;margin-top:8px;line-height:1.5;">Design a caching layer on top of Prisma middleware to lower database workloads.</div>
+          </div>
+          <div class="approval-details L">
+            <div class="appr-det L"><div class="appr-det-lbl L">Target Value</div><div class="appr-det-val L">1</div></div>
+            <div class="appr-det L"><div class="appr-det-lbl L">Weightage</div><div class="appr-det-val L">40%</div></div>
+          </div>
+          <div class="comment-box L"><div class="comment-lbl L">Review Feedback Comment</div><div class="comment-ph L">Optional review or rejection comment...</div></div>
+          <div class="btn-row">
+            <button class="btn-approve"><i class="ti ti-check" aria-hidden="true"></i> Approve & Lock</button>
+            <button class="btn-sendback L"><i class="ti ti-x" aria-hidden="true"></i> Send Back</button>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="sec-label">07 / Weightage donut</div>
+        <div class="block L">
+          <div class="block-ttl L">Weightage Allocation</div>
+          <div class="donut-wrap">
+            <svg width="86" height="86" viewBox="0 0 90 90" aria-hidden="true">
+              <circle cx="45" cy="45" r="35" fill="none" stroke="#E8E8E4" stroke-width="10"/>
+              <circle cx="45" cy="45" r="35" fill="none" stroke="#FFB800" stroke-width="10" stroke-dasharray="66 154" stroke-dashoffset="39" stroke-linecap="round"/>
+              <circle cx="45" cy="45" r="35" fill="none" stroke="#3DBF7A" stroke-width="10" stroke-dasharray="47 173" stroke-dashoffset="-27" stroke-linecap="round"/>
+              <circle cx="45" cy="45" r="35" fill="none" stroke="#5AA8F0" stroke-width="10" stroke-dasharray="66 154" stroke-dashoffset="-74" stroke-linecap="round"/>
+              <text x="45" y="42" text-anchor="middle" fill="#111" font-family="Syne,sans-serif" font-size="13" font-weight="700">100%</text>
+              <text x="45" y="55" text-anchor="middle" fill="#888" font-family="DM Mono,monospace" font-size="8">balanced</text>
+            </svg>
+            <div>
+              <div class="legend-item L"><div class="ldot" style="background:#FFB800;"></div>Prisma Cache — 40%</div>
+              <div class="legend-item L"><div class="ldot" style="background:#5AA8F0;"></div>Core Engine — 30%</div>
+              <div class="legend-item L"><div class="ldot" style="background:#3DBF7A;"></div>Redundant Code — 30%</div>
+            </div>
+          </div>
+          <div class="ok-banner L">✓ Balanced — Ready for submission</div>
+        </div>
+        <div style="margin-top:10px;">
+          <div class="sec-label">08 / Escalation alert</div>
+          <div class="esc-card L">
+            <div><div class="esc-name L">Employee B (QA Specialist)</div><div class="esc-desc L">Pending goal sheet waiting L1 review for 7+ days.</div></div>
+            <span class="badge badge-overdue L">Overdue</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="sec-label">09 / Full dashboard shell</div>
+      <div class="dash-shell L">
+        <div class="dash-topbar L">
+          <div class="dash-brand">
+            <div class="dash-logo"><div class="dash-logo-inner"></div></div>
+            <div class="dash-name L">AtomAlign</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span class="role-pill role-admin L"><span class="role-dot"></span>Secure Governance</span>
+            <button style="background:#FFB800;color:#0D0D0D;border:none;border-radius:7px;padding:6px 13px;font-family:'Syne',sans-serif;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:5px;"><i class="ti ti-refresh" style="font-size:12px;" aria-hidden="true"></i> Sync Database</button>
+          </div>
+        </div>
+        <div class="dash-body">
+          <div class="dash-sidebar L">
+            <div class="nav-sec L">Governance</div>
+            <div class="nav-item active L"><i class="ti ti-layout-dashboard nav-ico" aria-hidden="true"></i> Goal Governance</div>
+            <div class="nav-item L"><i class="ti ti-users nav-ico" aria-hidden="true"></i> Shared KPIs</div>
+            <div class="nav-item L"><i class="ti ti-chart-bar nav-ico" aria-hidden="true"></i> Heatmap</div>
+            <div class="nav-item L"><i class="ti ti-history nav-ico" aria-hidden="true"></i> Audit Diffs</div>
+            <div class="nav-div L"></div>
+            <div class="nav-sec L">Actions</div>
+            <button class="action-btn primary L"><i class="ti ti-player-play" style="font-size:12px;" aria-hidden="true"></i> Trigger Overdue Sweep</button>
+            <button class="action-btn L"><i class="ti ti-file-export" style="font-size:12px;" aria-hidden="true"></i> Export Alignment</button>
+            <button class="action-btn L"><i class="ti ti-report" style="font-size:12px;" aria-hidden="true"></i> Progress Report</button>
+          </div>
+          <div class="dash-content">
+            <div><div class="dash-pg-title L">System Administration</div><div class="dash-pg-sub L">Organization-wide alignment, unlock rules, audit diffs, and escalations check.</div></div>
+            <div class="metric-grid">
+              <div class="metric-card neutral L" style="padding:11px;"><div class="metric-lbl L">Employees</div><div class="metric-val" style="font-size:22px;color:#111;">3</div></div>
+              <div class="metric-card accent L" style="padding:11px;"><div class="metric-lbl L">Submission</div><div class="metric-val amber L" style="font-size:22px;">58%</div></div>
+              <div class="metric-card danger L" style="padding:11px;"><div class="metric-lbl L">Pending</div><div class="metric-val danger L" style="font-size:22px;">3</div></div>
+              <div class="metric-card danger L" style="padding:11px;"><div class="metric-lbl L">Escalations</div><div class="metric-val danger L" style="font-size:22px;">1</div></div>
+            </div>
+            <div class="goal-grid">
+              <div class="goal-card L" style="padding:11px;">
+                <div style="display:flex;justify-content:space-between;gap:6px;"><div class="goal-ttl L" style="font-size:12px;">Core Engine Optimization</div><span class="badge badge-draft L">Draft</span></div>
+                <div class="goal-meta L">Employee A · Engineering</div>
+              </div>
+              <div class="goal-card L" style="padding:11px;">
+                <div style="display:flex;justify-content:space-between;gap:6px;"><div class="goal-ttl L" style="font-size:12px;">Design Library Alignment</div><span class="badge badge-locked L">Locked</span></div>
+                <div class="goal-meta L">Employee C · Product</div>
+              </div>
+            </div>
+            <div class="esc-card L" style="padding:9px 14px;">
+              <div><div class="esc-name L" style="font-size:12px;">Employee B (QA Specialist)</div><div class="esc-desc L" style="font-size:10px;">Pending goal sheet waiting L1 review for 7+ days.</div></div>
+              <span class="badge badge-overdue L">Overdue</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="watermark L">AtomAlign Design System · Pearl White × Atomberg Amber · Light Mode · Syne + DM Mono</div>
+  </div>
+
+  <div id="panel-dark" class="panel D">
+    <div>
+      <div class="sec-label">01 / Color palette — dark mode</div>
+      <div class="pal-grid">
+        <div class="swatch D"><div class="sw-bar" style="background:#0D0D0D;border:0.5px solid rgba(255,255,255,0.1);"></div><div class="sw-info"><div class="sw-name">Midnight</div><div class="sw-hex">#0D0D0D</div></div></div>
+        <div class="swatch D"><div class="sw-bar" style="background:#141414;"></div><div class="sw-info"><div class="sw-name">Surface</div><div class="sw-hex">#141414</div></div></div>
+        <div class="swatch D"><div class="sw-bar" style="background:#1A1A1A;"></div><div class="sw-info"><div class="sw-name">Card</div><div class="sw-hex">#1A1A1A</div></div></div>
+        <div class="swatch D"><div class="sw-bar" style="background:#FFB800;"></div><div class="sw-info"><div class="sw-name">Amber</div><div class="sw-hex">#FFB800</div></div></div>
+        <div class="swatch D"><div class="sw-bar" style="background:#F5F5F5;"></div><div class="sw-info"><div class="sw-name">Pearl</div><div class="sw-hex">#F5F5F5</div></div></div>
+        <div class="swatch D"><div class="sw-bar" style="background:#A8A8A0;"></div><div class="sw-info"><div class="sw-name">Ivory</div><div class="sw-hex">#A8A8A0</div></div></div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:6px;">
+        <div class="swatch D" style="flex-direction:row;align-items:center;gap:10px;padding:8px 12px;display:flex;"><div class="sw-bar" style="width:28px;height:28px;flex-shrink:0;border-radius:6px;background:#3DBF7A;"></div><div><div class="sw-name">Success</div><div class="sw-hex">#3DBF7A</div></div></div>
+        <div class="swatch D" style="flex-direction:row;align-items:center;gap:10px;padding:8px 12px;display:flex;"><div class="sw-bar" style="width:28px;height:28px;flex-shrink:0;border-radius:6px;background:#E24B4A;"></div><div><div class="sw-name">Danger</div><div class="sw-hex">#E24B4A</div></div></div>
+        <div class="swatch D" style="flex-direction:row;align-items:center;gap:10px;padding:8px 12px;display:flex;"><div class="sw-bar" style="width:28px;height:28px;flex-shrink:0;border-radius:6px;background:#E29A1A;"></div><div><div class="sw-name">Warning</div><div class="sw-hex">#E29A1A</div></div></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="sec-label">02 / Typography</div>
+      <div class="type-stack">
+        <div class="type-row D"><span class="type-lbl D">H1 · 28px 700</span><span style="font-family:'Syne',sans-serif;font-size:26px;font-weight:700;color:#F5F5F5;">System Administration</span></div>
+        <div class="type-row D"><span class="type-lbl D">H2 · 18px 600</span><span style="font-family:'Syne',sans-serif;font-size:18px;font-weight:600;color:#F5F5F5;">Organizational Goal Search</span></div>
+        <div class="type-row D"><span class="type-lbl D">Eyebrow · Mono</span><span style="font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#FFB800;">Active Cycle: FY2026</span></div>
+        <div class="type-row D"><span class="type-lbl D">Body · 14px</span><span style="font-size:13px;color:#A8A8A0;line-height:1.5;">Optimize backend Express query routing to improve latency by 20%.</span></div>
+        <div class="type-row D"><span class="type-lbl D">Data · Mono</span><span style="font-family:'DM Mono',monospace;font-size:12px;color:#F5F5F5;">PERCENT_MIN → 100 · Weightage: 30%</span></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="sec-label">03 / Badges & roles</div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div class="badge-row">
+          <span class="badge badge-fy D">FY2026</span>
+          <span class="badge badge-draft D">Draft</span>
+          <span class="badge badge-submitted D">Submitted</span>
+          <span class="badge badge-locked D">Locked</span>
+          <span class="badge badge-approved D">Approved</span>
+          <span class="badge badge-overdue D">Overdue</span>
+        </div>
+        <div class="badge-row">
+          <span class="role-pill role-admin D"><span class="role-dot"></span>Secure Governance</span>
+          <span class="role-pill role-manager D"><span class="role-dot"></span>L1 Manager</span>
+          <span class="role-pill role-employee D"><span class="role-dot"></span>Employee</span>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="sec-label">04 / Metric cards</div>
+      <div class="metric-grid">
+        <div class="metric-card neutral D"><div class="metric-lbl D">Employees</div><div class="metric-val D">3</div><i class="ti ti-users metric-ico D" aria-hidden="true"></i></div>
+        <div class="metric-card accent D"><div class="metric-lbl D">Goal Submission</div><div class="metric-val amber D">58%</div><i class="ti ti-target metric-ico D" aria-hidden="true"></i></div>
+        <div class="metric-card danger D"><div class="metric-lbl D">Pending Approvals</div><div class="metric-val danger D">3</div><i class="ti ti-alert-triangle metric-ico D" aria-hidden="true"></i></div>
+        <div class="metric-card danger D"><div class="metric-lbl D">Active Escalations</div><div class="metric-val danger D">1</div><i class="ti ti-flame metric-ico D" aria-hidden="true"></i></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="sec-label">05 / Goal lifecycle cards</div>
+      <div class="goal-grid">
+        <div class="goal-card D">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;"><div class="goal-ttl D">Core Engine Optimization</div><span class="badge badge-draft D">Draft</span></div>
+          <div class="goal-meta D">Employee A · Engineering</div>
+          <div class="goal-desc D">Optimize backend Express query routing to improve latency by 20%.</div>
+          <div class="prog-track D"><div class="prog-fill" style="width:0%"></div></div>
+          <div class="goal-footer"><span class="goal-wt">Weightage 30%</span></div>
+        </div>
+        <div class="goal-card D">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;"><div class="goal-ttl D">Design Library Alignment</div><span class="badge badge-locked D">Locked</span></div>
+          <div class="goal-meta D">Employee C · Product</div>
+          <div class="goal-desc D">Align design system guidelines with active brand specifications.</div>
+          <div class="prog-track D"><div class="prog-fill" style="width:65%;background:#E29A1A;"></div></div>
+          <div class="goal-footer"><span class="goal-wt">Weightage 30%</span><button class="unlock-btn D"><i class="ti ti-lock-open" style="font-size:10px;" aria-hidden="true"></i> Unlock Sheet</button></div>
+        </div>
+        <div class="goal-card D">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;"><div class="goal-ttl D">Automated E2E Suite</div><span class="badge badge-approved D">Approved</span></div>
+          <div class="goal-meta D">Employee B · Engineering</div>
+          <div class="goal-desc D">Implement end-to-end regression test scripts for portal onboarding.</div>
+          <div class="prog-track D"><div class="prog-fill" style="width:100%;background:#3DBF7A;"></div></div>
+          <div class="goal-footer"><span class="goal-wt">Weightage 40%</span></div>
+        </div>
+        <div class="goal-card D">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;"><div class="goal-ttl D">Bug Escape Rate Reduction</div><span class="badge badge-submitted D">Submitted</span></div>
+          <div class="goal-meta D">Employee B · Engineering</div>
+          <div class="goal-desc D">Minimize production bug escape rate below 5% through robust validation.</div>
+          <div class="prog-track D"><div class="prog-fill" style="width:45%;"></div></div>
+          <div class="goal-footer"><span class="goal-wt">Weightage 30%</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div>
+        <div class="sec-label">06 / Manager approval</div>
+        <div class="approval-card D">
+          <div>
+            <div style="font-size:14px;font-weight:600;color:#F5F5F5;">Prisma Cache Service</div>
+            <div style="font-family:'DM Mono',monospace;font-size:10px;color:#A8A8A0;margin-top:3px;">Employee A · Engineering</div>
+            <div style="font-size:12px;color:#A8A8A0;margin-top:8px;line-height:1.5;">Design a caching layer on top of Prisma middleware to lower database workloads.</div>
+          </div>
+          <div class="approval-details D">
+            <div class="appr-det D"><div class="appr-det-lbl D">Target Value</div><div class="appr-det-val D">1</div></div>
+            <div class="appr-det D"><div class="appr-det-lbl D">Weightage</div><div class="appr-det-val D">40%</div></div>
+          </div>
+          <div class="comment-box D"><div class="comment-lbl D">Review Feedback Comment</div><div class="comment-ph D">Optional review or rejection comment...</div></div>
+          <div class="btn-row">
+            <button class="btn-approve"><i class="ti ti-check" aria-hidden="true"></i> Approve & Lock</button>
+            <button class="btn-sendback D"><i class="ti ti-x" aria-hidden="true"></i> Send Back</button>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="sec-label">07 / Weightage donut</div>
+        <div class="block D">
+          <div class="block-ttl D">Weightage Allocation</div>
+          <div class="donut-wrap">
+            <svg width="86" height="86" viewBox="0 0 90 90" aria-hidden="true">
+              <circle cx="45" cy="45" r="35" fill="none" stroke="#1A1A1A" stroke-width="10"/>
+              <circle cx="45" cy="45" r="35" fill="none" stroke="#FFB800" stroke-width="10" stroke-dasharray="66 154" stroke-dashoffset="39" stroke-linecap="round"/>
+              <circle cx="45" cy="45" r="35" fill="none" stroke="#3DBF7A" stroke-width="10" stroke-dasharray="47 173" stroke-dashoffset="-27" stroke-linecap="round"/>
+              <circle cx="45" cy="45" r="35" fill="none" stroke="#5AA8F0" stroke-width="10" stroke-dasharray="66 154" stroke-dashoffset="-74" stroke-linecap="round"/>
+              <text x="45" y="42" text-anchor="middle" fill="#F5F5F5" font-family="Syne,sans-serif" font-size="13" font-weight="700">100%</text>
+              <text x="45" y="55" text-anchor="middle" fill="#A8A8A0" font-family="DM Mono,monospace" font-size="8">balanced</text>
+            </svg>
+            <div>
+              <div class="legend-item D"><div class="ldot" style="background:#FFB800;"></div>Prisma Cache — 40%</div>
+              <div class="legend-item D"><div class="ldot" style="background:#5AA8F0;"></div>Core Engine — 30%</div>
+              <div class="legend-item D"><div class="ldot" style="background:#3DBF7A;"></div>Redundant Code — 30%</div>
+            </div>
+          </div>
+          <div class="ok-banner D">✓ Balanced — Ready for submission</div>
+        </div>
+        <div style="margin-top:10px;">
+          <div class="sec-label">08 / Escalation alert</div>
+          <div class="esc-card D">
+            <div><div class="esc-name D">Employee B (QA Specialist)</div><div class="esc-desc D">Pending goal sheet waiting L1 review for 7+ days.</div></div>
+            <span class="badge badge-overdue D">Overdue</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="sec-label">09 / Full dashboard shell</div>
+      <div class="dash-shell D">
+        <div class="dash-topbar D">
+          <div class="dash-brand">
+            <div class="dash-logo"><div class="dash-logo-inner"></div></div>
+            <div class="dash-name D">AtomAlign</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span class="role-pill role-admin D"><span class="role-dot"></span>Secure Governance</span>
+            <button style="background:#FFB800;color:#0D0D0D;border:none;border-radius:7px;padding:6px 13px;font-family:'Syne',sans-serif;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:5px;"><i class="ti ti-refresh" style="font-size:12px;" aria-hidden="true"></i> Sync Database</button>
+          </div>
+        </div>
+        <div class="dash-body">
+          <div class="dash-sidebar D">
+            <div class="nav-sec D">Governance</div>
+            <div class="nav-item active D"><i class="ti ti-layout-dashboard nav-ico" aria-hidden="true"></i> Goal Governance</div>
+            <div class="nav-item D"><i class="ti ti-users nav-ico" aria-hidden="true"></i> Shared KPIs</div>
+            <div class="nav-item D"><i class="ti ti-chart-bar nav-ico" aria-hidden="true"></i> Heatmap</div>
+            <div class="nav-item D"><i class="ti ti-history nav-ico" aria-hidden="true"></i> Audit Diffs</div>
+            <div class="nav-div D"></div>
+            <div class="nav-sec D">Actions</div>
+            <button class="action-btn primary"><i class="ti ti-player-play" style="font-size:12px;" aria-hidden="true"></i> Trigger Overdue Sweep</button>
+            <button class="action-btn D"><i class="ti ti-file-export" style="font-size:12px;" aria-hidden="true"></i> Export Alignment</button>
+            <button class="action-btn D"><i class="ti ti-report" style="font-size:12px;" aria-hidden="true"></i> Progress Report</button>
+          </div>
+          <div class="dash-content">
+            <div><div class="dash-pg-title D">System Administration</div><div class="dash-pg-sub D">Organization-wide alignment, unlock rules, audit diffs, and escalations check.</div></div>
+            <div class="metric-grid">
+              <div class="metric-card neutral D" style="padding:11px;"><div class="metric-lbl D">Employees</div><div class="metric-val D" style="font-size:22px;">3</div></div>
+              <div class="metric-card accent D" style="padding:11px;"><div class="metric-lbl D">Submission</div><div class="metric-val amber D" style="font-size:22px;">58%</div></div>
+              <div class="metric-card danger D" style="padding:11px;"><div class="metric-lbl D">Pending</div><div class="metric-val danger D" style="font-size:22px;">3</div></div>
+              <div class="metric-card danger D" style="padding:11px;"><div class="metric-lbl D">Escalations</div><div class="metric-val danger D" style="font-size:22px;">1</div></div>
+            </div>
+            <div class="goal-grid">
+              <div class="goal-card D" style="padding:11px;">
+                <div style="display:flex;justify-content:space-between;gap:6px;"><div class="goal-ttl D" style="font-size:12px;">Core Engine Optimization</div><span class="badge badge-draft D">Draft</span></div>
+                <div class="goal-meta D">Employee A · Engineering</div>
+              </div>
+              <div class="goal-card D" style="padding:11px;">
+                <div style="display:flex;justify-content:space-between;gap:6px;"><div class="goal-ttl D" style="font-size:12px;">Design Library Alignment</div><span class="badge badge-locked D">Locked</span></div>
+                <div class="goal-meta D">Employee C · Product</div>
+              </div>
+            </div>
+            <div class="esc-card D" style="padding:9px 14px;">
+              <div><div class="esc-name D" style="font-size:12px;">Employee B (QA Specialist)</div><div class="esc-desc D" style="font-size:10px;">Pending goal sheet waiting L1 review for 7+ days.</div></div>
+              <span class="badge badge-overdue D">Overdue</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="watermark D">AtomAlign Design System · Midnight Black × Atomberg Amber · Dark Mode · Syne + DM Mono</div>
+  </div>
+</div>
+
+<script>
+function switchMode(mode) {
+  document.getElementById('panel-light').classList.toggle('visible', mode === 'light');
+  document.getElementById('panel-dark').classList.toggle('visible', mode === 'dark');
+  document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
+  document.querySelector('.mode-tab.' + mode).classList.add('active');
+}
+</script>

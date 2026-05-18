@@ -6,6 +6,7 @@ import goalRoutes from './routes/goal.routes';
 import approvalRoutes from './routes/approval.routes';
 import checkinRoutes from './routes/checkin.routes';
 import analyticsRoutes from './routes/analytics.routes';
+import adminRoutes from './routes/admin.routes';
 
 const app = express();
 
@@ -18,6 +19,7 @@ app.use('/api/goals', goalRoutes);
 app.use('/api/approvals', approvalRoutes);
 app.use('/api', checkinRoutes);
 app.use('/api/analytics', analyticsRoutes);
+app.use('/api/admin', adminRoutes);
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok' });

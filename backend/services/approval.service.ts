@@ -16,6 +16,23 @@ export const getPendingApprovals = async (managerId: string) => {
   });
 };
 
+export const getTeamGoals = async (managerId: string) => {
+  return await prisma.goal.findMany({
+    where: {
+      employee: {
+        managerId: managerId
+      }
+    },
+    include: {
+      employee: {
+        select: { name: true, department: true }
+      },
+      updates: true,
+      checkins: true
+    }
+  });
+};
+
 export const updateGoalStatus = async (managerId: string, goalId: string, status: 'APPROVED_LOCKED' | 'UNDER_REVIEW' | 'DRAFT', comment?: string) => {
   // First verify the goal belongs to a subordinate
   const goal = await prisma.goal.findFirst({

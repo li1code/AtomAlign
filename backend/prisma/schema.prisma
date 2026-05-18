@@ -104,6 +104,8 @@ model Goal {
   auditLogs    AuditLog[]
 
   // Shared Goals
+  isShared     Boolean     @default(false)
+  isPrimary    Boolean     @default(false)
   sharedGoalId String?
   sharedGoal   SharedGoal? @relation(fields: [sharedGoalId], references: [id])
 

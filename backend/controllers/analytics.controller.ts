@@ -3,17 +3,18 @@ import { AuthRequest } from '../middleware/auth.middleware';
 import prisma from '../prisma/client';
 import { runEscalationCheck } from '../services/escalation.service';
 import * as auditService from '../services/audit.service';
+import * as analyticsService from '../services/analytics.service';
 
 export const getDashboardStats = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const totalEmployees = await prisma.user.count({ where: { role: 'EMPLOYEE' } });
     
-    // Simplistic completion rate based on submitted goals vs employees
+    // Completion rate based on submitted or locked goals vs employees
     const submittedGoalsCount = await prisma.goal.count({
       where: { status: { in: ['SUBMITTED', 'UNDER_REVIEW', 'APPROVED_LOCKED', 'FINALIZED'] } }
     });
-    // This is just a proxy metric
-    const submissionRate = totalEmployees > 0 ? Math.min(Math.round((submittedGoalsCount / (totalEmployees * 5)) * 100), 100) : 0;
+    
+    const submissionRate = totalEmployees > 0 ? Math.min(Math.round((submittedGoalsCount / (totalEmployees * 4)) * 100), 100) : 0;
     
     const pendingApprovals = await prisma.goal.count({
       where: { status: 'SUBMITTED' }
@@ -29,6 +30,42 @@ export const getDashboardStats = async (req: AuthRequest, res: Response): Promis
       pendingApprovals,
       activeEscalations
     });
+  } catch (error: any) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const getDepartmentStats = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const result = await analyticsService.getDepartmentProgress();
+    res.json(result);
+  } catch (error: any) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const getQoQStats = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const result = await analyticsService.getQoQTrends();
+    res.json(result);
+  } catch (error: any) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const getDistributionStats = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const result = await analyticsService.getGoalDistribution();
+    res.json(result);
+  } catch (error: any) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const getManagerStats = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const result = await analyticsService.getManagerEffectiveness();
+    res.json(result);
   } catch (error: any) {
     res.status(500).json({ message: error.message });
   }

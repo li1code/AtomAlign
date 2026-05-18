@@ -9,6 +9,7 @@ router.use(authenticate);
 router.use(requireRole(['MANAGER', 'ADMIN']));
 
 router.get('/pending', approvalController.getPending);
+router.get('/team-goals', approvalController.getTeam);
 router.post('/:id/approve', approvalController.approveGoal);
 router.post('/:id/reject', approvalController.rejectGoal);
 
