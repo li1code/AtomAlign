@@ -13,32 +13,14 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>('dark');
-  const [mounted, setMounted] = useState(false);
+  const theme: Theme = 'light';
 
-  useEffect(() => {
-    // Read from localStorage on mount
-    const savedTheme = localStorage.getItem('atomalign-theme') as Theme;
-    if (savedTheme === 'light' || savedTheme === 'dark') {
-      setThemeState(savedTheme);
-    }
-    setMounted(true);
-  }, []);
-
-  const setTheme = (newTheme: Theme) => {
-    setThemeState(newTheme);
-    localStorage.setItem('atomalign-theme', newTheme);
-  };
-
-  const toggleTheme = () => {
-    const nextTheme = theme === 'light' ? 'dark' : 'light';
-    setTheme(nextTheme);
-  };
+  const setTheme = (newTheme: Theme) => {};
+  const toggleTheme = () => {};
 
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme, setTheme }}>
-      {/* Wrap children inside a mounted gate to prevent server-client hydration mismatches on theme classes */}
-      <div className={mounted ? (theme === 'light' ? 'L' : 'D') : 'D'}>
+      <div className="L">
         {children}
       </div>
     </ThemeContext.Provider>

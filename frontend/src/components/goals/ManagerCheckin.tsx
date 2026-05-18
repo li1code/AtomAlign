@@ -11,10 +11,7 @@ export default function ManagerCheckin({ goalId, onUpdate }: { goalId: string, o
     e.preventDefault();
     setLoading(true);
     try {
-      await api.post(`/goals/${goalId}/checkin`, {
-        quarter,
-        comment
-      });
+      await api.post(`/goals/${goalId}/checkin`, { quarter, comment });
       setSuccess(true);
       setComment('');
       onUpdate();
@@ -25,37 +22,31 @@ export default function ManagerCheckin({ goalId, onUpdate }: { goalId: string, o
     }
   };
 
+  const inputClass = "bg-white dark:bg-[#0D0D0D] border border-[#D4D4D8] dark:border-[rgba(255,255,255,0.1)] rounded-lg p-2 text-[#111] dark:text-[#F5F5F5] text-xs focus:border-[#FFB800] focus:outline-none transition-all";
+
   return (
-    <form onSubmit={handleCheckin} className="mt-4 pt-4 border-t border-zinc-700/50">
-      <h4 className="text-xs font-medium text-zinc-400 mb-2">Record Check-in</h4>
+    <form onSubmit={handleCheckin} className="mt-3 pt-3 border-t border-[#E8E8E4] dark:border-white/[0.07]">
+      <h4 className="text-[10px] font-semibold text-[#888] dark:text-[#A8A8A0] mb-2 font-mono uppercase tracking-wider">Record Check-in</h4>
       <div className="flex gap-2">
-        <select 
-          value={quarter} 
-          onChange={e => setQuarter(e.target.value)}
-          className="bg-zinc-900 border border-zinc-700 rounded p-1 text-white text-xs focus:outline-none"
-        >
+        <select value={quarter} onChange={e => setQuarter(e.target.value)} className={inputClass}>
           <option value="Q1">Q1</option>
           <option value="Q2">Q2</option>
           <option value="Q3">Q3</option>
           <option value="Q4">Q4</option>
         </select>
         <input 
-          type="text" 
-          value={comment}
-          onChange={e => setComment(e.target.value)}
+          type="text" value={comment} onChange={e => setComment(e.target.value)}
           placeholder="Check-in notes..."
           required
-          className="flex-1 bg-zinc-900 border border-zinc-700 rounded p-1 text-white text-xs focus:outline-none"
+          className={inputClass + " flex-1 placeholder:text-[#BBB] dark:placeholder:text-[rgba(168,168,160,0.4)]"}
         />
-        <button 
-          type="submit" 
-          disabled={loading}
-          className="px-3 bg-zinc-700 hover:bg-zinc-600 text-white text-xs rounded transition-colors disabled:opacity-50"
+        <button type="submit" disabled={loading}
+          className="px-4 py-2 bg-[#FFB800] hover:bg-[#E5A600] text-[#0D0D0D] font-semibold text-xs rounded-lg border-none transition-colors disabled:opacity-50"
         >
           {loading ? '...' : 'Save'}
         </button>
       </div>
-      {success && <p className="text-green-500 text-xs mt-1">Check-in recorded.</p>}
+      {success && <p className="text-[#3B6D11] dark:text-[#3DBF7A] text-xs mt-1">Check-in recorded.</p>}
     </form>
   );
 }

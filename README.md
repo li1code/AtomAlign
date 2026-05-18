@@ -7,6 +7,12 @@ AtomAlign is a production-grade, role-aware Goal Setting & Tracking Portal that 
 
 ---
 
+## Project Status (May 2026)
+
+AtomAlign is **fully operational and feature-complete**. The codebase compiles with zero errors across the entire stack. The portal has undergone a full visual and functional pass to deliver production-ready performance governance.
+
+---
+
 ## Architecture Overview
 
 ```
@@ -44,7 +50,7 @@ AtomAlign is a production-grade, role-aware Goal Setting & Tracking Portal that 
 | Validation | Zod (schema-level, frontend + backend) |
 | ORM | Prisma |
 | Database | PostgreSQL |
-| Auth | Stateless JWT, role-persisted sessions |
+| Auth | Stateless JWT, role-persisted sessions · bcrypt credential hashing |
 
 ---
 
@@ -120,7 +126,7 @@ AtomAlign/
 │       │   │   └── WeightageTracker.tsx # Live 100% progress widget
 │       │   ├── checkins/
 │       │   └── layout/
-│       │       ├── Sidebar.tsx
+│       │       ├── Sidebar.tsx         # Collapsible icon rail (68px) / expanded (240px)
 │       │       ├── Navbar.tsx
 │       │       └── DashboardShell.tsx
 │       ├── hooks/
@@ -157,6 +163,16 @@ AtomAlign/
 
 ### Authentication & RBAC
 JWT-based stateless auth with three roles: `EMPLOYEE`, `MANAGER`, `ADMIN`. Every API route is guarded by `auth.middleware.ts` (token verification) followed by `role.middleware.ts` (permission scoping). On the frontend, `middleware.ts` enforces client-side route guards, and `useAuth.ts` exposes the Zustand-backed auth state across the app.
+
+Password changes are handled via a dedicated `PUT /api/auth/change-password` endpoint. Credentials are verified and rewritten using `bcrypt` hashing on the Node.js backend — plaintext passwords are never persisted or compared directly.
+
+### UI & Layout System
+The interface is locked to a clean, premium light-mode aesthetic — enforced at the theme architecture level via the `L` class selector. Toggle controls have been removed from all navigation and settings pages to maintain brand consistency.
+
+- **Color palette:** `#F4F4F0` warm-neutral backgrounds · white card surfaces · high-contrast borders · `#FFB800` amber accent highlights
+- **Typography:** All placeholder text and body fonts use elevated contrast levels for maximum readability
+- **Sidebar:** Fully responsive collapsible navigation that toggles between an icon rail (`68px`) and an expanded panel (`240px`) with tooltip support at all widths
+- **Header:** Role indicator, active page title, and a user action dropdown for profile and account settings
 
 ### Goal Lifecycle Engine
 Goals follow a strict state machine: `DRAFT → SUBMITTED → APPROVED (LOCKED)` or `DRAFT (returned for rework)`.
@@ -210,6 +226,9 @@ Admins or managers can push a departmental KPI to multiple employees simultaneou
 | Analytics | `/api/analytics` | `analytics.controller.ts` |
 | Admin | `/api/admin` | `admin.controller.ts` |
 
+### Notable Endpoints
+- `PUT /api/auth/change-password` — bcrypt-secured credential update, connected to the account settings page
+
 ---
 
 ## Local Setup
@@ -256,6 +275,7 @@ npm run dev                   # http://localhost:3000
 | Audit Trail | `auditLogger.ts` → `AuditLog` table, surfaced in admin panel |
 | Reporting | Analytics service, exportable achievement data, completion dashboard |
 | Escalation (Bonus) | `escalation.service.ts` with 7-day rule and admin sweep trigger |
+| Security | bcrypt password hashing · JWT stateless auth · role-scoped middleware |
 
 ---
 

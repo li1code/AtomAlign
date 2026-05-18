@@ -238,8 +238,8 @@ export default function AdminDashboard() {
 
   if (authLoading || fetching) {
     return (
-      <div className="min-h-screen bg-zinc-950 flex flex-col items-center justify-center text-zinc-400 gap-3">
-        <div className="w-8 h-8 border-2 border-yellow-500 border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-screen bg-[#0D0D0D] flex flex-col items-center justify-center text-zinc-400 gap-3">
+        <div className="w-8 h-8 border-2 border-[#FFB800] border-t-transparent rounded-full animate-spin" />
         <p className="text-sm font-medium tracking-wide">Syncing AtomAlign Governance...</p>
       </div>
     );
@@ -267,14 +267,6 @@ export default function AdminDashboard() {
             </div>
 
             <div className="flex items-center gap-3">
-              {/* Theme toggler widget */}
-              <button 
-                onClick={toggleTheme}
-                className="mode-tab !w-auto !rounded-lg !px-3 !py-1 bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-800 dark:text-zinc-200 hover:bg-zinc-200 dark:hover:bg-zinc-800 text-[10px] font-bold font-mono transition-all flex items-center gap-1 cursor-pointer"
-              >
-                {theme === 'light' ? '☀ LIGHT' : '◐ DARK'}
-              </button>
-
               {/* Secure Governance role badge */}
               <span className="role-pill role-admin">
                 <span className="role-dot" /> Secure Governance
@@ -298,9 +290,9 @@ export default function AdminDashboard() {
                 {profileOpen && (
                   <div className="user-dropdown">
                     <div className="user-info-section font-sans">
-                      <div className="font-semibold text-xs text-zinc-900 dark:text-zinc-100">{user?.name}</div>
-                      <div className="text-[10px] text-zinc-500 font-mono mt-0.5">{user?.email}</div>
-                      <div className="text-[9px] uppercase tracking-wider text-yellow-600 dark:text-yellow-500 font-mono font-bold mt-1.5">System Admin</div>
+                      <div className="font-semibold text-xs text-[#111] dark:text-[#F5F5F5]">{user?.name}</div>
+                      <div className="text-[10px] text-[#888] font-mono mt-0.5">{user?.email}</div>
+                      <div className="text-[9px] uppercase tracking-wider text-[#FFB800] dark:text-[#FFB800] font-mono font-bold mt-1.5">System Admin</div>
                     </div>
                     <button 
                       onClick={() => router.push('/dashboard/profile')}
@@ -398,16 +390,16 @@ export default function AdminDashboard() {
                 
                 <button 
                   onClick={loadAllAdminData}
-                  className="px-3 py-2 bg-yellow-500 hover:bg-yellow-400 text-zinc-950 font-bold rounded-lg text-xs transition-all flex items-center gap-1.5 shadow-sm cursor-pointer"
+                  className="px-3 py-2 bg-[#FFB800] hover:bg-yellow-400 text-[#111] font-bold rounded-lg text-xs transition-all flex items-center gap-1.5 shadow-sm cursor-pointer"
                 >
                   <i className="ti ti-refresh" /> Sync Database
                 </button>
               </div>
 
               {feedbackMsg && (
-                <div className="p-3 bg-zinc-100 dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-800 rounded-lg text-yellow-600 dark:text-yellow-500 text-xs flex justify-between items-center font-medium">
+                <div className="p-3 bg-[#F7F7F5] dark:bg-[#1A1A1A] border border-[#D4D4D8] dark:border-white/[0.07] rounded-lg text-[#FFB800] dark:text-[#FFB800] text-xs flex justify-between items-center font-medium">
                   <span>{feedbackMsg}</span>
-                  <button onClick={() => setFeedbackMsg('')} className="text-zinc-500 hover:text-zinc-300 font-bold text-sm">&times;</button>
+                  <button onClick={() => setFeedbackMsg('')} className="text-[#888] hover:text-zinc-300 font-bold text-sm">&times;</button>
                 </div>
               )}
 
@@ -448,7 +440,7 @@ export default function AdminDashboard() {
                     <div className="flex flex-col md:flex-row justify-between items-center gap-2">
                       <div className="block-ttl !mb-0">Organizational Goal Search</div>
                       <div className="relative w-full md:w-64">
-                        <Search className="absolute left-3 top-2.5 text-zinc-500" size={14} />
+                        <Search className="absolute left-3 top-2.5 text-[#888]" size={14} />
                         <input
                           type="text"
                           placeholder="Search employee or goal..."
@@ -462,13 +454,13 @@ export default function AdminDashboard() {
 
                   {/* Inline Unlock Confirm form */}
                   {unlockingGoalId && (
-                    <div className="block !bg-yellow-500/5 border border-yellow-500/20">
-                      <h4 className="font-bold text-sm text-yellow-500 mb-2 flex items-center gap-1.5">
+                    <div className="block !bg-[#FFB800]/5 border border-[#FFB800]/20">
+                      <h4 className="font-bold text-sm text-[#FFB800] mb-2 flex items-center gap-1.5">
                         <Unlock size={14} /> Unlock Sheet Confirmation
                       </h4>
                       <form onSubmit={handleUnlockGoal} className="space-y-3">
                         <p className="text-xs text-zinc-400">
-                          Unlocking will return the employee's approved goal card to <strong className="text-yellow-500">Draft</strong> state. A governance reason is mandatory.
+                          Unlocking will return the employee's approved goal card to <strong className="text-[#FFB800]">Draft</strong> state. A governance reason is mandatory.
                         </p>
                         <input
                           type="text"
@@ -482,14 +474,14 @@ export default function AdminDashboard() {
                           <button
                             type="button"
                             onClick={() => setUnlockingGoalId(null)}
-                            className="px-3 py-1.5 bg-zinc-850 dark:bg-zinc-800 hover:bg-zinc-700 rounded text-xs text-zinc-300 cursor-pointer"
+                            className="px-3 py-1.5 bg-zinc-850 dark:bg-[#1A1A1A] hover:bg-zinc-700 rounded text-xs text-zinc-300 cursor-pointer"
                           >
                             Cancel
                           </button>
                           <button
                             type="submit"
                             disabled={actionLoading}
-                            className="px-3 py-1.5 bg-[#FFB800] hover:bg-[#E2A400] text-zinc-950 rounded text-xs font-semibold cursor-pointer border-none"
+                            className="px-3 py-1.5 bg-[#FFB800] hover:bg-[#E2A400] text-[#111] rounded text-xs font-semibold cursor-pointer border-none"
                           >
                             Confirm & Unlock
                           </button>
@@ -546,7 +538,7 @@ export default function AdminDashboard() {
                       <AlertTriangle size={15} /> Active Escalation Queue
                     </div>
                     {escalations.length === 0 ? (
-                      <p className="text-xs text-zinc-500 font-mono">No overdue approval escalations found.</p>
+                      <p className="text-xs text-[#888] font-mono">No overdue approval escalations found.</p>
                     ) : (
                       <div className="space-y-2 font-sans">
                         {escalations.map(esc => (
@@ -571,12 +563,12 @@ export default function AdminDashboard() {
               {activeTab === 'kpis' && (
                 <div className="block">
                   <div className="block-ttl flex items-center gap-1.5">
-                    <Layers size={16} className="text-yellow-500" /> Distribute Shared Departmental KPI
+                    <Layers size={16} className="text-[#FFB800]" /> Distribute Shared Departmental KPI
                   </div>
                   <form onSubmit={handleDistributeKpi} className="space-y-4 font-sans">
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-xs font-semibold text-zinc-500 mb-1.5">KPI Title</label>
+                        <label className="block text-xs font-semibold text-[#888] mb-1.5">KPI Title</label>
                         <input
                           type="text"
                           required
@@ -587,7 +579,7 @@ export default function AdminDashboard() {
                         />
                       </div>
                       <div>
-                        <label className="block text-xs font-semibold text-zinc-500 mb-1.5">Thrust Area</label>
+                        <label className="block text-xs font-semibold text-[#888] mb-1.5">Thrust Area</label>
                         <input
                           type="text"
                           required
@@ -600,7 +592,7 @@ export default function AdminDashboard() {
                     </div>
 
                     <div>
-                      <label className="block text-xs font-semibold text-zinc-500 mb-1.5">Description</label>
+                      <label className="block text-xs font-semibold text-[#888] mb-1.5">Description</label>
                       <textarea
                         required
                         value={kpiForm.description}
@@ -612,7 +604,7 @@ export default function AdminDashboard() {
 
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-xs font-semibold text-zinc-500 mb-1.5">Metric Type (UoM)</label>
+                        <label className="block text-xs font-semibold text-[#888] mb-1.5">Metric Type (UoM)</label>
                         <select
                           value={kpiForm.uomType}
                           onChange={e => setKpiForm(prev => ({ ...prev, uomType: e.target.value }))}
@@ -627,7 +619,7 @@ export default function AdminDashboard() {
                         </select>
                       </div>
                       <div>
-                        <label className="block text-xs font-semibold text-zinc-500 mb-1.5">Target Value</label>
+                        <label className="block text-xs font-semibold text-[#888] mb-1.5">Target Value</label>
                         <input
                           type="number"
                           required
@@ -639,16 +631,16 @@ export default function AdminDashboard() {
                     </div>
 
                     {/* Recipient Selection Grid */}
-                    <div className="border-t border-zinc-200 dark:border-zinc-900 pt-4 mt-2">
-                      <label className="block text-xs font-semibold text-zinc-500 mb-2">Select Recipient Employees</label>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-40 overflow-y-auto bg-zinc-50/50 dark:bg-zinc-950/40 p-3 rounded-lg border border-zinc-200 dark:border-zinc-900">
+                    <div className="border-t border-[#E8E8E4] dark:border-zinc-900 pt-4 mt-2">
+                      <label className="block text-xs font-semibold text-[#888] mb-2">Select Recipient Employees</label>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-40 overflow-y-auto bg-[#F7F7F5] dark:bg-[#141414] p-3 rounded-lg border border-[#E8E8E4] dark:border-zinc-900">
                         {employees.map(emp => (
-                          <label key={emp.id} className="flex items-center gap-2 text-xs text-zinc-700 dark:text-zinc-300 cursor-pointer hover:text-white">
+                          <label key={emp.id} className="flex items-center gap-2 text-xs text-[#555] dark:text-[#A8A8A0] cursor-pointer hover:text-white">
                             <input
                               type="checkbox"
                               checked={kpiForm.employeeIds.includes(emp.id)}
                               onChange={() => handleCheckboxChange(emp.id)}
-                              className="rounded bg-zinc-100 dark:bg-zinc-900 border-zinc-300 dark:border-zinc-750 text-yellow-500 focus:ring-yellow-500/50"
+                              className="rounded bg-[#F7F7F5] dark:bg-[#1A1A1A] border-[#D4D4D8] dark:border-zinc-750 text-[#FFB800] focus:ring-yellow-500/50"
                             />
                             <span>{emp.name} ({emp.department?.name || 'N/A'})</span>
                           </label>
@@ -657,7 +649,7 @@ export default function AdminDashboard() {
                     </div>
 
                     <div>
-                      <label className="block text-xs font-semibold text-zinc-500 mb-1.5">Designate Primary Driver / Owner (KPI updates propagate from them)</label>
+                      <label className="block text-xs font-semibold text-[#888] mb-1.5">Designate Primary Driver / Owner (KPI updates propagate from them)</label>
                       <select
                         value={kpiForm.primaryEmployeeId}
                         onChange={e => setKpiForm(prev => ({ ...prev, primaryEmployeeId: e.target.value }))}
@@ -673,7 +665,7 @@ export default function AdminDashboard() {
                     <button
                       type="submit"
                       disabled={actionLoading}
-                      className="w-full py-3 bg-[#FFB800] hover:bg-[#E2A400] text-zinc-950 font-bold rounded-lg text-xs shadow-md transition-all cursor-pointer border-none"
+                      className="w-full py-3 bg-[#FFB800] hover:bg-[#E2A400] text-[#111] font-bold rounded-lg text-xs shadow-md transition-all cursor-pointer border-none"
                     >
                       Distribute Shared KPI Sheet
                     </button>
@@ -690,13 +682,13 @@ export default function AdminDashboard() {
                     <div className="space-y-4">
                       {deptStats.map((dept, idx) => (
                         <div key={idx} className="space-y-1.5">
-                          <div className="flex justify-between items-center text-xs text-zinc-700 dark:text-zinc-300">
+                          <div className="flex justify-between items-center text-xs text-[#555] dark:text-[#A8A8A0]">
                             <span className="font-semibold">{dept.departmentName} ({dept.employeeCount} Subordinates)</span>
-                            <span className="text-yellow-600 dark:text-yellow-500 font-bold font-mono">{dept.averageProgress}% Done</span>
+                            <span className="text-[#FFB800] dark:text-[#FFB800] font-bold font-mono">{dept.averageProgress}% Done</span>
                           </div>
-                          <div className="w-full h-2 bg-zinc-200 dark:bg-zinc-950 rounded-full overflow-hidden border border-zinc-300 dark:border-zinc-900">
+                          <div className="w-full h-2 bg-[#F0EFEB] dark:bg-[#0D0D0D] rounded-full overflow-hidden border border-[#D4D4D8] dark:border-zinc-900">
                             <div 
-                              className="h-full bg-yellow-500 rounded-full transition-all duration-500" 
+                              className="h-full bg-[#FFB800] rounded-full transition-all duration-500" 
                               style={{ width: `${dept.averageProgress}%` }}
                             />
                           </div>
@@ -710,10 +702,10 @@ export default function AdminDashboard() {
                     <div className="block-ttl">Quarter-on-Quarter Completion Trends</div>
                     <div className="grid grid-cols-4 gap-4">
                       {qoqStats.map((q, idx) => (
-                        <div key={idx} className="p-3 bg-zinc-50/50 dark:bg-zinc-950/40 border border-zinc-250 dark:border-zinc-850 rounded-lg text-center">
-                          <span className="text-[10px] text-zinc-500 block font-semibold font-mono uppercase tracking-wider">{q.quarter}</span>
-                          <span className="text-xl font-extrabold text-zinc-800 dark:text-white mt-1 block">{q.averageProgress}%</span>
-                          <span className="text-[10px] text-zinc-500 mt-0.5 block font-mono">{q.updateCount} updates</span>
+                        <div key={idx} className="p-3 bg-[#F7F7F5] dark:bg-[#141414] border border-[#E8E8E4] dark:border-zinc-850 rounded-lg text-center">
+                          <span className="text-[10px] text-[#888] block font-semibold font-mono uppercase tracking-wider">{q.quarter}</span>
+                          <span className="text-xl font-extrabold text-[#111] dark:text-[#F5F5F5] mt-1 block">{q.averageProgress}%</span>
+                          <span className="text-[10px] text-[#888] mt-0.5 block font-mono">{q.updateCount} updates</span>
                         </div>
                       ))}
                     </div>
@@ -724,14 +716,14 @@ export default function AdminDashboard() {
                     <div className="block-ttl">L1 Managers effectiveness leaderboard</div>
                     <div className="space-y-3 font-sans">
                       {managerStats.map((m, idx) => (
-                        <div key={idx} className="p-3 bg-zinc-50/50 dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-850 rounded-lg flex justify-between items-center text-xs">
+                        <div key={idx} className="p-3 bg-[#F7F7F5] dark:bg-[#1A1A1A]/40 border border-[#E8E8E4] dark:border-zinc-850 rounded-lg flex justify-between items-center text-xs">
                           <div>
-                            <strong className="text-zinc-800 dark:text-white block font-sans">{m.managerName}</strong>
-                            <span className="text-zinc-500 text-[10px] font-mono">{m.email}</span>
+                            <strong className="text-[#111] dark:text-[#F5F5F5] block font-sans">{m.managerName}</strong>
+                            <span className="text-[#888] text-[10px] font-mono">{m.email}</span>
                           </div>
                           <div className="text-right">
                             <span className="font-bold text-green-600 dark:text-green-500">{m.completionRate}% check-ins logged</span>
-                            <span className="text-[10px] text-zinc-500 block mt-0.5">{m.subordinateCount} subordinates</span>
+                            <span className="text-[10px] text-[#888] block mt-0.5">{m.subordinateCount} subordinates</span>
                           </div>
                         </div>
                       ))}
@@ -745,33 +737,33 @@ export default function AdminDashboard() {
               {activeTab === 'audit' && (
                 <div className="block">
                   <div className="block-ttl flex items-center gap-1.5">
-                    <History size={16} className="text-yellow-500" /> System Governance Audit Trail
+                    <History size={16} className="text-[#FFB800]" /> System Governance Audit Trail
                   </div>
                   {logs.length === 0 ? (
-                    <p className="text-zinc-500 text-xs font-mono">No audit entries recorded.</p>
+                    <p className="text-[#888] text-xs font-mono">No audit entries recorded.</p>
                   ) : (
                     <div className="space-y-4 max-h-[500px] overflow-y-auto pr-1">
                       {logs.map(log => (
-                        <div key={log.id} className="p-3 bg-zinc-50/50 dark:bg-zinc-900/60 rounded-xl border border-zinc-200 dark:border-zinc-850 text-xs">
-                          <div className="flex justify-between items-center mb-2 border-b border-zinc-200 dark:border-zinc-950 pb-2">
+                        <div key={log.id} className="p-3 bg-[#F7F7F5] dark:bg-[#1A1A1A]/60 rounded-xl border border-[#E8E8E4] dark:border-zinc-850 text-xs">
+                          <div className="flex justify-between items-center mb-2 border-b border-[#E8E8E4] dark:border-zinc-950 pb-2">
                             <div>
-                              <span className="font-semibold text-zinc-800 dark:text-white">{log.user.name} ({log.user.role})</span>
-                              <span className="text-zinc-500 block text-[10px] mt-0.5">
-                                Action: <strong className="text-yellow-600 dark:text-yellow-500">{log.action}</strong> {log.goal ? `on "${log.goal.title}"` : ''}
+                              <span className="font-semibold text-[#111] dark:text-[#F5F5F5]">{log.user.name} ({log.user.role})</span>
+                              <span className="text-[#888] block text-[10px] mt-0.5">
+                                Action: <strong className="text-[#FFB800] dark:text-[#FFB800]">{log.action}</strong> {log.goal ? `on "${log.goal.title}"` : ''}
                               </span>
                             </div>
-                            <span className="text-zinc-600 dark:text-zinc-500 text-[10px] font-mono">{new Date(log.createdAt).toLocaleString()}</span>
+                            <span className="text-[#888] dark:text-[#888] text-[10px] font-mono">{new Date(log.createdAt).toLocaleString()}</span>
                           </div>
 
                           {(log.before || log.after) && (
-                            <div className="grid grid-cols-2 gap-4 mt-2 bg-zinc-100 dark:bg-zinc-950/40 p-2.5 rounded-lg border border-zinc-200 dark:border-zinc-900 font-mono">
+                            <div className="grid grid-cols-2 gap-4 mt-2 bg-[#F7F7F5] dark:bg-[#141414] p-2.5 rounded-lg border border-[#E8E8E4] dark:border-zinc-900 font-mono">
                               <div>
-                                <span className="text-zinc-500 block text-[10px] font-semibold mb-1 uppercase tracking-wider">Before State</span>
-                                <p className="text-zinc-650 dark:text-zinc-400 text-[10px] break-all">{log.before || 'N/A'}</p>
+                                <span className="text-[#888] block text-[10px] font-semibold mb-1 uppercase tracking-wider">Before State</span>
+                                <p className="text-[#888] dark:text-[#A8A8A0] text-[10px] break-all">{log.before || 'N/A'}</p>
                               </div>
-                              <div className="border-l border-zinc-200 dark:border-zinc-900 pl-4">
-                                <span className="text-zinc-500 block text-[10px] font-semibold mb-1 uppercase tracking-wider">After State</span>
-                                <p className="text-zinc-800 dark:text-zinc-300 text-[10px] break-all">{log.after || 'N/A'}</p>
+                              <div className="border-l border-[#E8E8E4] dark:border-zinc-900 pl-4">
+                                <span className="text-[#888] block text-[10px] font-semibold mb-1 uppercase tracking-wider">After State</span>
+                                <p className="text-[#111] dark:text-[#A8A8A0] text-[10px] break-all">{log.after || 'N/A'}</p>
                               </div>
                             </div>
                           )}

@@ -14,13 +14,8 @@ export default function QuarterlyUpdateForm({ goal, onUpdate }: { goal: any, onU
     setLoading(true);
     setError('');
     setSuccess('');
-
     try {
-      await api.post(`/goals/${goal.id}/progress`, {
-        quarter,
-        actualAchievement: actual,
-        status
-      });
+      await api.post(`/goals/${goal.id}/progress`, { quarter, actualAchievement: actual, status });
       setSuccess('Progress updated successfully!');
       onUpdate();
     } catch (err: any) {
@@ -30,21 +25,19 @@ export default function QuarterlyUpdateForm({ goal, onUpdate }: { goal: any, onU
     }
   };
 
-  return (
-    <div className="bg-zinc-800/50 p-4 rounded-lg mt-4 border border-zinc-700/50">
-      <h4 className="text-sm font-medium text-white mb-3">Update Progress</h4>
-      
-      {error && <div className="mb-3 text-red-400 text-xs">{error}</div>}
-      {success && <div className="mb-3 text-green-400 text-xs">{success}</div>}
+  const inputClass = "bg-white dark:bg-[#0D0D0D] border border-[#D4D4D8] dark:border-[rgba(255,255,255,0.1)] rounded-lg p-2 text-[#111] dark:text-[#F5F5F5] text-xs focus:border-[#FFB800] focus:outline-none transition-all";
 
-      <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+  return (
+    <div className="bg-[#F7F7F5] dark:bg-[#141414] p-4 rounded-xl border border-[#E8E8E4] dark:border-white/[0.07]">
+      <h4 className="text-[10px] font-semibold text-[#888] dark:text-[#A8A8A0] mb-3 font-mono uppercase tracking-wider">Update Progress</h4>
+      
+      {error && <div className="mb-3 text-[#A32D2D] dark:text-[#E24B4A] text-xs">{error}</div>}
+      {success && <div className="mb-3 text-[#3B6D11] dark:text-[#3DBF7A] text-xs">{success}</div>}
+
+      <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-4 gap-3 items-end">
         <div>
-          <label className="block text-xs text-zinc-400 mb-1">Quarter</label>
-          <select 
-            value={quarter} 
-            onChange={e => setQuarter(e.target.value)}
-            className="w-full bg-zinc-900 border border-zinc-700 rounded p-2 text-white text-xs focus:outline-none"
-          >
+          <label className="block text-[10px] font-semibold text-[#888] dark:text-[#A8A8A0] mb-1 font-mono">Quarter</label>
+          <select value={quarter} onChange={e => setQuarter(e.target.value)} className={inputClass + " w-full"}>
             <option value="Q1">Q1</option>
             <option value="Q2">Q2</option>
             <option value="Q3">Q3</option>
@@ -53,31 +46,20 @@ export default function QuarterlyUpdateForm({ goal, onUpdate }: { goal: any, onU
           </select>
         </div>
         <div>
-          <label className="block text-xs text-zinc-400 mb-1">Actual</label>
-          <input 
-            type="number" 
-            value={actual}
-            onChange={e => setActual(parseFloat(e.target.value))}
-            className="w-full bg-zinc-900 border border-zinc-700 rounded p-2 text-white text-xs focus:outline-none"
-          />
+          <label className="block text-[10px] font-semibold text-[#888] dark:text-[#A8A8A0] mb-1 font-mono">Actual</label>
+          <input type="number" value={actual} onChange={e => setActual(parseFloat(e.target.value))} className={inputClass + " w-full"} />
         </div>
         <div>
-          <label className="block text-xs text-zinc-400 mb-1">Status</label>
-          <select 
-            value={status} 
-            onChange={e => setStatus(e.target.value)}
-            className="w-full bg-zinc-900 border border-zinc-700 rounded p-2 text-white text-xs focus:outline-none"
-          >
+          <label className="block text-[10px] font-semibold text-[#888] dark:text-[#A8A8A0] mb-1 font-mono">Status</label>
+          <select value={status} onChange={e => setStatus(e.target.value)} className={inputClass + " w-full"}>
             <option value="NOT_STARTED">Not Started</option>
             <option value="ON_TRACK">On Track</option>
             <option value="COMPLETED">Completed</option>
           </select>
         </div>
         <div>
-          <button 
-            type="submit" 
-            disabled={loading}
-            className="w-full py-2 bg-yellow-500 hover:bg-yellow-400 text-zinc-900 text-xs font-semibold rounded disabled:opacity-50"
+          <button type="submit" disabled={loading}
+            className="w-full py-2.5 bg-[#FFB800] hover:bg-[#E5A600] text-[#0D0D0D] text-xs font-semibold rounded-lg disabled:opacity-50 border-none transition-colors"
           >
             {loading ? 'Saving...' : 'Log Update'}
           </button>

@@ -1,52 +1,34 @@
+"use client";
+
 import React, { useState } from 'react';
 import api from '../../services/api';
-import { Check, X, Edit3, Save } from 'lucide-react';
+import { Check, X, Edit3, Save, ChevronDown, ChevronUp } from 'lucide-react';
 
 export default function ApprovalQueue({ pendingGoals, onAction }: { pendingGoals: any[], onAction: () => void }) {
   const [loading, setLoading] = useState<string | null>(null);
   const [comments, setComments] = useState<Record<string, string>>({});
-  
-  // Track inline edits by manager
   const [edits, setEdits] = useState<Record<string, { target: number; weightage: number }>>({});
   const [isEditing, setIsEditing] = useState<Record<string, boolean>>({});
+  const [expandedRow, setExpandedRow] = useState<Record<string, boolean>>({});
 
   const handleEditToggle = (goalId: string, currentTarget: number, currentWeightage: number) => {
     if (!isEditing[goalId]) {
-      setEdits(prev => ({
-        ...prev,
-        [goalId]: { target: currentTarget, weightage: currentWeightage }
-      }));
+      setEdits(prev => ({ ...prev, [goalId]: { target: currentTarget, weightage: currentWeightage } }));
     }
     setIsEditing(prev => ({ ...prev, [goalId]: !prev[goalId] }));
   };
 
   const handleFieldChange = (goalId: string, field: 'target' | 'weightage', value: number) => {
-    setEdits(prev => ({
-      ...prev,
-      [goalId]: {
-        ...prev[goalId],
-        [field]: value
-      }
-    }));
+    setEdits(prev => ({ ...prev, [goalId]: { ...prev[goalId], [field]: value } }));
   };
 
   const handleAction = async (goalId: string, action: 'approve' | 'reject') => {
     setLoading(goalId);
     try {
-      // 1. If inline edits are active, save the target and weightage adjustments first
       if (isEditing[goalId] && edits[goalId]) {
-        await api.put(`/goals/${goalId}`, {
-          target: edits[goalId].target,
-          weightage: edits[goalId].weightage
-        });
+        await api.put(`/goals/${goalId}`, { target: edits[goalId].target, weightage: edits[goalId].weightage });
       }
-
-      // 2. Process approval or rejection
-      await api.post(`/approvals/${goalId}/${action}`, {
-        comment: comments[goalId] || ''
-      });
-
-      // Clear states
+      await api.post(`/approvals/${goalId}/${action}`, { comment: comments[goalId] || '' });
       setIsEditing(prev => ({ ...prev, [goalId]: false }));
       onAction();
     } catch (err) {
@@ -57,112 +39,133 @@ export default function ApprovalQueue({ pendingGoals, onAction }: { pendingGoals
     }
   };
 
-  const handleCommentChange = (goalId: string, value: string) => {
-    setComments(prev => ({ ...prev, [goalId]: value }));
-  };
+  const inputClass = "bg-white dark:bg-[#0D0D0D] border border-[#D4D4D8] dark:border-[rgba(255,255,255,0.1)] rounded-lg text-[#111] dark:text-[#F5F5F5] text-xs focus:border-[#FFB800] focus:outline-none transition-all";
 
   if (pendingGoals.length === 0) {
     return (
-      <div className="bg-zinc-900/40 border border-zinc-800 rounded-xl p-8 shadow-xl text-center">
-        <h2 className="text-xl font-bold mb-2 text-white">Approval Queue</h2>
-        <p className="text-zinc-500 text-sm">No pending employee goal sheets require your review.</p>
+      <div className="bg-white dark:bg-[#1A1A1A] border border-[#E8E8E4] dark:border-white/[0.07] rounded-xl p-6 text-center">
+        <h2 className="text-sm font-semibold text-[#111] dark:text-[#F5F5F5] mb-1 font-syne">Approval Queue</h2>
+        <p className="text-[#888] dark:text-[#A8A8A0] text-xs">No pending goal sheets require review.</p>
       </div>
     );
   }
 
   return (
-    <div className="bg-zinc-900/40 border border-zinc-800 rounded-xl p-6 shadow-xl backdrop-blur-md">
-      <h2 className="text-xl font-bold mb-6 text-white flex items-center gap-2">
-        Approval Queue <span className="bg-yellow-500 text-zinc-950 text-xs font-semibold py-0.5 px-2.5 rounded-full">{pendingGoals.length}</span>
-      </h2>
+    <div className="bg-white dark:bg-[#1A1A1A] border border-[#E8E8E4] dark:border-white/[0.07] rounded-xl overflow-hidden">
+      <div className="p-4 border-b border-[#E8E8E4] dark:border-white/[0.07] bg-[#F7F7F5] dark:bg-[#141414] flex items-center justify-between">
+        <h2 className="text-sm font-semibold text-[#111] dark:text-[#F5F5F5] flex items-center gap-2 font-syne">
+          Approval Queue 
+          <span className="badge badge-submitted text-[9px]">{pendingGoals.length} Pending</span>
+        </h2>
+      </div>
 
-      <div className="space-y-4">
-        {pendingGoals.map(goal => {
-          const editing = isEditing[goal.id];
-          const currentEdit = edits[goal.id] || { target: goal.target, weightage: goal.weightage };
+      <div className="overflow-x-auto">
+        <table className="w-full text-left border-collapse text-xs">
+          <thead>
+            <tr className="border-b border-[#E8E8E4] dark:border-white/[0.07] text-[#888] dark:text-[#A8A8A0] bg-[#F7F7F5] dark:bg-[#141414] font-mono text-[10px] uppercase tracking-wider">
+              <th className="py-3 px-4 w-8"></th>
+              <th className="py-3 px-4">Employee</th>
+              <th className="py-3 px-4">Goal Title & Thrust</th>
+              <th className="py-3 px-4">Target</th>
+              <th className="py-3 px-4">Weightage</th>
+              <th className="py-3 px-4">Feedback Comment</th>
+              <th className="py-3 px-4 text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-[#E8E8E4] dark:divide-white/[0.07]">
+            {pendingGoals.map(goal => {
+              const editing = isEditing[goal.id];
+              const isExpanded = expandedRow[goal.id];
+              const currentEdit = edits[goal.id] || { target: goal.target, weightage: goal.weightage };
 
-          return (
-            <div key={goal.id} className="p-5 bg-zinc-900/60 rounded-xl border border-zinc-800 relative hover:border-zinc-700 transition-all">
-              
-              <div className="flex justify-between items-start mb-2">
-                <div>
-                  <h3 className="font-semibold text-white text-base">{goal.title}</h3>
-                  <p className="text-xs text-yellow-500 font-medium mt-0.5">
-                    {goal.employee?.name} &middot; {goal.employee?.department?.name || 'N/A'}
-                  </p>
-                </div>
-                <button
-                  onClick={() => handleEditToggle(goal.id, goal.target, goal.weightage)}
-                  className="px-3 py-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs rounded border border-zinc-700 flex items-center gap-1.5 transition-colors"
-                >
-                  <Edit3 size={12} /> {editing ? 'Save Inline' : 'Edit Inline'}
-                </button>
-              </div>
-              
-              <p className="text-sm text-zinc-400 mb-4 mt-2 leading-relaxed">{goal.description}</p>
-              
-              {/* Target & Weightage Adjustment Fields */}
-              <div className="grid grid-cols-2 gap-4 mb-5 text-sm bg-zinc-950/40 p-4 rounded-lg border border-zinc-850">
-                <div>
-                  <span className="text-zinc-500 block text-xs font-medium mb-1">Target Value</span>
-                  {editing ? (
-                    <input
-                      type="number"
-                      value={currentEdit.target}
-                      onChange={e => handleFieldChange(goal.id, 'target', parseFloat(e.target.value) || 0)}
-                      className="bg-zinc-900 border border-zinc-700 rounded px-2 py-1 text-white text-xs w-full focus:outline-none focus:border-yellow-500"
-                    />
-                  ) : (
-                    <span className="text-white font-semibold">{goal.target}</span>
+              return (
+                <React.Fragment key={goal.id}>
+                  <tr className="hover:bg-[#F7F7F5] dark:hover:bg-[#141414] transition-colors">
+                    <td className="py-3 px-4">
+                      <button onClick={() => setExpandedRow(prev => ({ ...prev, [goal.id]: !prev[goal.id] }))}
+                        className="p-1 text-[#888] hover:text-[#111] dark:hover:text-[#F5F5F5] rounded transition-colors"
+                      >
+                        {isExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                      </button>
+                    </td>
+                    <td className="py-3 px-4">
+                      <div className="flex items-center gap-2">
+                        <div className="w-6 h-6 rounded-full bg-[rgba(255,184,0,0.12)] text-[#FFB800] flex items-center justify-center font-semibold text-[10px]">
+                          {goal.employee?.name?.slice(0, 2).toUpperCase() || 'EM'}
+                        </div>
+                        <div>
+                          <p className="text-[#111] dark:text-[#F5F5F5] font-semibold">{goal.employee?.name}</p>
+                          <p className="text-[10px] text-[#888] dark:text-[#A8A8A0]">{goal.employee?.department?.name || 'N/A'}</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="py-3 px-4">
+                      <p className="text-[#111] dark:text-[#F5F5F5] font-semibold">{goal.title}</p>
+                      <p className="text-[10px] text-[#888] dark:text-[#A8A8A0] font-mono mt-0.5">{goal.thrustArea}</p>
+                    </td>
+                    <td className="py-3 px-4 font-mono">
+                      {editing ? (
+                        <input type="number" value={currentEdit.target}
+                          onChange={e => handleFieldChange(goal.id, 'target', parseFloat(e.target.value) || 0)}
+                          className={inputClass + " w-16 px-1.5 py-0.5"} />
+                      ) : (
+                        <span className="text-[#111] dark:text-[#F5F5F5] font-semibold">{goal.target} {goal.uomType}</span>
+                      )}
+                    </td>
+                    <td className="py-3 px-4 font-mono">
+                      {editing ? (
+                        <input type="number" value={currentEdit.weightage}
+                          onChange={e => handleFieldChange(goal.id, 'weightage', parseFloat(e.target.value) || 0)}
+                          className={inputClass + " w-16 px-1.5 py-0.5"} />
+                      ) : (
+                        <span className="text-[#FFB800] font-semibold">{goal.weightage}%</span>
+                      )}
+                    </td>
+                    <td className="py-3 px-4">
+                      <input type="text" value={comments[goal.id] || ''}
+                        onChange={e => setComments(prev => ({ ...prev, [goal.id]: e.target.value }))}
+                        className={inputClass + " w-full px-2 py-1 placeholder:text-[#BBB] dark:placeholder:text-[rgba(168,168,160,0.4)]"}
+                        placeholder="Review comment..." />
+                    </td>
+                    <td className="py-3 px-4 text-right">
+                      <div className="flex items-center justify-end gap-1.5">
+                        <button onClick={() => handleEditToggle(goal.id, goal.target, goal.weightage)}
+                          className="p-1.5 bg-[#F7F7F5] dark:bg-[#141414] hover:bg-[#F0EFEB] dark:hover:bg-[rgba(255,255,255,0.04)] text-[#555] dark:text-[#A8A8A0] rounded-lg border border-[#E8E8E4] dark:border-white/[0.07] transition-colors"
+                          title={editing ? "Save Parameters" : "Edit Inline"}
+                        >
+                          {editing ? <Save size={12} /> : <Edit3 size={12} />}
+                        </button>
+                        <button onClick={() => handleAction(goal.id, 'approve')} disabled={loading === goal.id}
+                          className="p-1.5 bg-[#EAF3DE] dark:bg-[rgba(61,191,122,0.1)] hover:bg-[#d4edbe] dark:hover:bg-[rgba(61,191,122,0.15)] text-[#3B6D11] dark:text-[#3DBF7A] border border-[#97C459] dark:border-[rgba(61,191,122,0.25)] rounded-lg transition-colors disabled:opacity-50"
+                          title="Approve & Lock"
+                        >
+                          <Check size={12} />
+                        </button>
+                        <button onClick={() => handleAction(goal.id, 'reject')} disabled={loading === goal.id}
+                          className="p-1.5 bg-[#FCEBEB] dark:bg-[rgba(226,75,74,0.1)] hover:bg-[#f9d5d5] dark:hover:bg-[rgba(226,75,74,0.15)] text-[#A32D2D] dark:text-[#E24B4A] border border-[#F09595] dark:border-[rgba(226,75,74,0.25)] rounded-lg transition-colors disabled:opacity-50"
+                          title="Send Back"
+                        >
+                          <X size={12} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+
+                  {isExpanded && (
+                    <tr className="bg-[#F7F7F5] dark:bg-[#141414]">
+                      <td colSpan={7} className="py-3 px-8 text-[#555] dark:text-[#A8A8A0]">
+                        <div className="space-y-1">
+                          <p className="font-semibold text-[#111] dark:text-[#F5F5F5] text-xs">Goal Description:</p>
+                          <p className="text-xs italic leading-relaxed">"{goal.description}"</p>
+                        </div>
+                      </td>
+                    </tr>
                   )}
-                </div>
-                <div>
-                  <span className="text-zinc-500 block text-xs font-medium mb-1">Weightage Allocation (%)</span>
-                  {editing ? (
-                    <input
-                      type="number"
-                      value={currentEdit.weightage}
-                      onChange={e => handleFieldChange(goal.id, 'weightage', parseFloat(e.target.value) || 0)}
-                      className="bg-zinc-900 border border-zinc-700 rounded px-2 py-1 text-white text-xs w-full focus:outline-none focus:border-yellow-500"
-                    />
-                  ) : (
-                    <span className="text-yellow-500 font-semibold">{goal.weightage}%</span>
-                  )}
-                </div>
-              </div>
-
-              {/* Manager Feedback */}
-              <div className="mb-5">
-                <label className="block text-xs font-medium text-zinc-500 mb-1.5">Review Feedback Comment</label>
-                <input 
-                  type="text" 
-                  value={comments[goal.id] || ''}
-                  onChange={e => handleCommentChange(goal.id, e.target.value)}
-                  className="w-full bg-zinc-900 border border-zinc-800 rounded-lg p-2.5 text-white text-xs focus:ring-1 focus:ring-yellow-500 focus:outline-none placeholder-zinc-650" 
-                  placeholder="Optional review or rejection comment..." 
-                />
-              </div>
-
-              <div className="flex gap-3">
-                <button 
-                  onClick={() => handleAction(goal.id, 'approve')}
-                  disabled={loading === goal.id}
-                  className="flex-1 py-2.5 px-4 bg-green-500/10 hover:bg-green-500/20 text-green-500 border border-green-500/30 rounded-lg transition-all flex items-center justify-center gap-2 text-sm font-semibold disabled:opacity-50"
-                >
-                  <Check size={16} /> Approve & Lock
-                </button>
-                <button 
-                  onClick={() => handleAction(goal.id, 'reject')}
-                  disabled={loading === goal.id}
-                  className="flex-1 py-2.5 px-4 bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/30 rounded-lg transition-all flex items-center justify-center gap-2 text-sm font-semibold disabled:opacity-50"
-                >
-                  <X size={16} /> Send Back
-                </button>
-              </div>
-
-            </div>
-          );
-        })}
+                </React.Fragment>
+              );
+            })}
+          </tbody>
+        </table>
       </div>
     </div>
   );
