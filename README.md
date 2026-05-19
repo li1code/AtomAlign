@@ -265,8 +265,8 @@ npm run dev                   # http://localhost:3000
 
 | Role     | Email                  | Password      |
 | -------- | ---------------------- | ------------- |
-| Employee | employee@atomalign.com | `password123` |
-| Manager  | manager@atomalign.com  | `password123` |
-| Admin    | admin@atomalign.com    | `password123` |
+| Employee | employee@atomberg.com | `password123` |
+| Manager  | manager@atomberg.com  | `password123` |
+| Admin    | admin@atomberg.com    | `password123` |
 
 ---
